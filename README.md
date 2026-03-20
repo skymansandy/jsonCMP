@@ -1,4 +1,6 @@
 # JsonCMP
+[![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/main.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/main.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/skymansandy/jsonCMP/actions/workflows/main.yml)
+
 
 Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, and JVM Desktop.
 
