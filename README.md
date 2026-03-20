@@ -1,5 +1,5 @@
 # JsonCMP
-[![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Maven](https://img.shields.io/badge/maven-1.0.0--alpha2-blue)](https://github.com/skymansandy/jsonCMP/packages)
+[![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Maven](https://img.shields.io/badge/maven-1.0.0--alpha1-blue)](https://github.com/skymansandy/jsonCMP/packages)
 
 
 Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, and JVM Desktop.
@@ -36,7 +36,7 @@ Then add the dependency:
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("dev.skymansandy:json-cmp:1.0.0-alpha2")
+    implementation("dev.skymansandy:json-cmp:1.0.0-alpha1")
 }
 ```
 
