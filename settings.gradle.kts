@@ -33,3 +33,4 @@ plugins {
 
 include(":json-cmp")
 include(":composeApp")
+include(":androidApp")
