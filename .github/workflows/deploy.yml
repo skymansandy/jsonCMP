@@ -86,16 +86,25 @@ jobs:
           fi
           echo "color=$COLOR" >> "$GITHUB_OUTPUT"
 
+      - name: Read version from gradle.properties
+        id: version
+        run: |
+          VERSION=$(grep 'jsoncmp.version=' gradle.properties | cut -d= -f2)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Update README badges
         run: |
           COVERAGE=${{ needs.test-and-coverage.outputs.coverage }}
           COLOR=${{ steps.badge.outputs.color }}
           REPO=${{ github.repository }}
+          VERSION=${{ steps.version.outputs.version }}
 
-          BUILD_BADGE="[![Build](https://github.com/${REPO}/actions/workflows/main.yml/badge.svg)](https://github.com/${REPO}/actions/workflows/main.yml)"
-          COVERAGE_BADGE="[![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR})](https://github.com/${REPO}/actions/workflows/main.yml)"
+          BUILD_BADGE="[![Build](https://github.com/${REPO}/actions/workflows/deploy.yml/badge.svg)](https://github.com/${REPO}/actions/workflows/deploy.yml)"
+          COVERAGE_BADGE="[![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR})](https://github.com/${REPO}/actions/workflows/deploy.yml)"
+          VERSION_ESCAPED=$(echo "$VERSION" | sed 's/-/--/g')
+          MAVEN_BADGE="[![Maven](https://img.shields.io/badge/maven-${VERSION_ESCAPED}-blue)](https://github.com/${REPO}/packages)"
 
-          BADGE_LINE="${BUILD_BADGE} ${COVERAGE_BADGE}"
+          BADGE_LINE="${BUILD_BADGE} ${COVERAGE_BADGE} ${MAVEN_BADGE}"
 
           if grep -q '^\[!\[Build\]' README.md; then
             sed -i "1,/^\[!\[Build\]/s|^\[!\[Build\].*|${BADGE_LINE}|" README.md
@@ -104,6 +113,12 @@ jobs:
           else
             sed -i "1a\\\\${BADGE_LINE}\n" README.md
           fi
+
+      - name: Update version in README and docs
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          sed -i "s|implementation(\"dev.skymansandy:json-cmp:[^\"]*\")|implementation(\"dev.skymansandy:json-cmp:${VERSION}\")|" README.md
+          find docs -name '*.md' -exec sed -i "s|implementation(\"dev.skymansandy:json-cmp:[^\"]*\")|implementation(\"dev.skymansandy:json-cmp:${VERSION}\")|" {} +
 
       - name: Commit badge updates
         run: |
@@ -164,3 +179,32 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  github-release:
+    name: GitHub Release
+    needs: [publish, update-badges]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version from gradle.properties
+        id: version
+        run: |
+          VERSION=$(grep 'jsoncmp.version=' gradle.properties | cut -d= -f2)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          TAG="v${VERSION}"
+
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists, skipping."
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --generate-notes \
+              --target main
+          fi
