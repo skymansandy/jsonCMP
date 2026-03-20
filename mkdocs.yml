@@ -1,0 +1,76 @@
+site_name: JsonCMP
+site_description: Kotlin Multiplatform Compose JSON viewer and editor component
+site_url: ""
+repo_url: https://github.com/skymansandy/jsonCMP
+repo_name: JsonCMP
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - content.tabs.link
+    - search.highlight
+    - search.share
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+nav:
+  - Overview:
+      - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quick-start.md
+  - Features:
+      - JSON Viewer: features/viewer.md
+      - JSON Editor: features/editor.md
+      - Themes: features/themes.md
+  - API Reference:
+      - JsonCMP: api/jsoncmp.md
+      - JsonEditorState: api/state.md
+      - JsonCmpColors: api/colors.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/skymansandy/jsonCMP
