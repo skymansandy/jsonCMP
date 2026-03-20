@@ -2,16 +2,14 @@ package dev.skymansandy.jsoncmp.component.editor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,51 +47,35 @@ internal fun CodeEditor(
     }
 
     val horizontalScrollState = rememberScrollState()
+    val verticalScrollState = rememberScrollState()
     val lineCount = remember(textFieldValue.text) { textFieldValue.text.count { it == '\n' } + 1 }
     val numDigits = remember(lineCount) { lineCount.toString().length }
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+
+    val highlighted: AnnotatedString = remember(textFieldValue.text, searchQuery, colors) {
+        highlightJson(
+            text = textFieldValue.text,
+            searchQuery = searchQuery,
+            colors = colors,
+        )
+    }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 200.dp)
-            .height(IntrinsicSize.Min)
+            .verticalScroll(verticalScrollState)
             .background(colors.background),
     ) {
-        // Line number gutter
+        // Line number gutter — positioned using actual text layout line offsets
         val borderColor = colors.gutterBorder
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .background(colors.gutterBackground)
-                .drawBehind {
-                    val x = size.width
-                    drawLine(
-                        borderColor,
-                        Offset(x, 0f),
-                        Offset(x, size.height),
-                        strokeWidth = 1.dp.toPx(),
-                    )
-                }
-                .padding(start = 12.dp, end = 8.dp),
-        ) {
-            for (i in 1..lineCount) {
-                Text(
-                    text = i.toString().padStart(numDigits),
-                    style = monoStyle,
-                    color = colors.lineNumber,
-                    softWrap = false,
-                )
-            }
-        }
-
-        // Text editor with syntax highlighting
-        val highlighted: AnnotatedString = remember(textFieldValue.text, searchQuery, colors) {
-            highlightJson(
-                text = textFieldValue.text,
-                searchQuery = searchQuery,
-                colors = colors,
-            )
-        }
+        LineNumberGutter(
+            lineCount = lineCount,
+            numDigits = numDigits,
+            textLayoutResult = textLayoutResult,
+            colors = colors,
+            borderColor = borderColor,
+        )
 
         BasicTextField(
             value = textFieldValue.copy(annotatedString = highlighted),
@@ -100,6 +84,7 @@ internal fun CodeEditor(
                 lastSyncedRaw = newValue.text
                 state.updateRawJson(newValue.text)
             },
+            onTextLayout = { textLayoutResult = it },
             textStyle = monoStyle,
             cursorBrush = SolidColor(colors.key),
             modifier = Modifier
@@ -107,6 +92,77 @@ internal fun CodeEditor(
                 .horizontalScroll(horizontalScrollState)
                 .padding(start = 8.dp, end = 16.dp),
         )
+    }
+}
+
+@Composable
+private fun LineNumberGutter(
+    lineCount: Int,
+    numDigits: Int,
+    textLayoutResult: TextLayoutResult?,
+    colors: JsonCmpColors,
+    borderColor: androidx.compose.ui.graphics.Color,
+) {
+    if (textLayoutResult == null || textLayoutResult.lineCount < lineCount) {
+        // Fallback: render without alignment until layout is available
+        Box(
+            modifier = Modifier
+                .background(colors.gutterBackground)
+                .drawBehind {
+                    val x = size.width
+                    drawLine(borderColor, Offset(x, 0f), Offset(x, size.height), strokeWidth = 1.dp.toPx())
+                }
+                .padding(start = 12.dp, end = 8.dp),
+        ) {
+            androidx.compose.foundation.layout.Column {
+                for (i in 1..lineCount) {
+                    Text(
+                        text = i.toString().padStart(numDigits),
+                        style = monoStyle,
+                        color = colors.lineNumber,
+                        softWrap = false,
+                    )
+                }
+            }
+        }
+        return
+    }
+
+    // Use Layout to position each line number at the exact Y offset from the text layout
+    Layout(
+        content = {
+            for (i in 1..lineCount) {
+                Text(
+                    text = i.toString().padStart(numDigits),
+                    style = monoStyle,
+                    color = colors.lineNumber,
+                    softWrap = false,
+                )
+            }
+        },
+        modifier = Modifier
+            .background(colors.gutterBackground)
+            .drawBehind {
+                val x = size.width
+                drawLine(borderColor, Offset(x, 0f), Offset(x, size.height), strokeWidth = 1.dp.toPx())
+            }
+            .padding(start = 12.dp, end = 8.dp),
+    ) { measurables, constraints ->
+        val textLayout = textLayoutResult
+        val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
+        val width = placeables.maxOfOrNull { it.width } ?: 0
+        val height = if (textLayout != null && textLayout.lineCount > 0) {
+            textLayout.getLineBottom(textLayout.lineCount - 1).toInt()
+        } else {
+            placeables.sumOf { it.height }
+        }
+
+        layout(width, height) {
+            placeables.forEachIndexed { index, placeable ->
+                val y = textLayout?.getLineTop(index)?.toInt() ?: (index * (placeables.firstOrNull()?.height ?: 0))
+                placeable.placeRelative(0, y)
+            }
+        }
     }
 }
 

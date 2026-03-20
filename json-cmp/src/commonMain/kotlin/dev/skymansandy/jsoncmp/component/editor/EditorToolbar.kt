@@ -1,6 +1,7 @@
 package dev.skymansandy.jsoncmp.component.editor
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +19,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,33 +55,47 @@ internal fun EditorToolbar(
             .background(colors.gutterBackground)
             .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End,
     ) {
         // Format: Beautify / Compact toggle
-        IconButton(
-            onClick = { state.format(compact = !state.isCompact) },
-            modifier = Modifier.size(36.dp),
+        val formatLabel = if (state.isCompact) "Beautify" else "Compact"
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = { PlainTooltip { Text(formatLabel) } },
+            state = rememberTooltipState(),
         ) {
-            Icon(
-                imageVector = if (state.isCompact) Icons.AutoMirrored.Filled.FormatIndentIncrease else Icons.Default.FormatAlignJustify,
-                contentDescription = if (state.isCompact) "Beautify" else "Compact",
-                tint = colors.key,
-                modifier = Modifier.size(18.dp),
-            )
+            IconButton(
+                onClick = { state.format(compact = !state.isCompact) },
+                modifier = Modifier.size(36.dp),
+            ) {
+                Icon(
+                    imageVector = if (state.isCompact) Icons.AutoMirrored.Filled.FormatIndentIncrease else Icons.Default.FormatAlignJustify,
+                    contentDescription = formatLabel,
+                    tint = colors.key,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
 
         ToolbarDivider(colors)
 
         // Sort
-        IconButton(
-            onClick = { showSortSheet = true },
-            modifier = Modifier.size(36.dp),
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = { PlainTooltip { Text("Sort keys") } },
+            state = rememberTooltipState(),
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Sort,
-                contentDescription = "Sort keys",
-                tint = colors.key,
-                modifier = Modifier.size(18.dp),
-            )
+            IconButton(
+                onClick = { showSortSheet = true },
+                modifier = Modifier.size(36.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Sort,
+                    contentDescription = "Sort keys",
+                    tint = colors.key,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
     }
 
