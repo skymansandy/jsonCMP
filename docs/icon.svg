@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C3AED"/>
+      <stop offset="100%" style="stop-color:#3B82F6"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect x="16" y="16" width="480" height="480" rx="96" ry="96" fill="url(#bg)"/>
+  <!-- Left curly brace { -->
+  <path d="M200 120 C200 120 168 120 168 152 L168 224 C168 240 148 256 132 256 C148 256 168 272 168 288 L168 360 C168 392 200 392 200 392"
+        fill="none" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Right curly brace } -->
+  <path d="M312 120 C312 120 344 120 344 152 L344 224 C344 240 364 256 380 256 C364 256 344 272 344 288 L344 360 C344 392 312 392 312 392"
+        fill="none" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Dot/colon elements for JSON feel -->
+  <circle cx="256" cy="220" r="14" fill="#FCD34D"/>
+  <circle cx="256" cy="292" r="14" fill="#FCD34D"/>
+</svg>
