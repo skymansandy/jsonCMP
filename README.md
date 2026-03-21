@@ -4,7 +4,7 @@
   <img src="docs/icon.svg" width="128" height="128" alt="JsonCMP Icon"/>
 </p>
 
-[![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Maven](https://img.shields.io/badge/maven-1.0.0--alpha1-blue)](https://github.com/skymansandy/jsonCMP/packages)
+[![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Maven Central](https://img.shields.io/badge/maven--central-1.0.0--alpha1-blue)](https://central.sonatype.com/artifact/dev.skymansandy/json-cmp)
 
 Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, and JVM Desktop.
 
@@ -18,19 +18,14 @@ Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, 
 
 ## Installation
 
-Add the GitHub Packages repository to your `settings.gradle.kts`:
+Add `mavenCentral()` to your repositories in `settings.gradle.kts`:
 
 ```kotlin
 // settings.gradle.kts
 dependencyResolutionManagement {
     repositories {
-        maven {
-            url = uri("https://maven.pkg.github.com/skymansandy/jsonCMP")
-            credentials {
-                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_USERNAME")
-                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+        mavenCentral()
+        google()
     }
 }
 ```

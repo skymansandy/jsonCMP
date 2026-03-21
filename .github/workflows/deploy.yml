@@ -10,7 +10,6 @@ concurrency:
 
 permissions:
   contents: write
-  packages: write
   pages: write
   id-token: write
 
@@ -102,7 +101,7 @@ jobs:
           BUILD_BADGE="[![Build](https://github.com/${REPO}/actions/workflows/deploy.yml/badge.svg)](https://github.com/${REPO}/actions/workflows/deploy.yml)"
           COVERAGE_BADGE="[![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR})](https://github.com/${REPO}/actions/workflows/deploy.yml)"
           VERSION_ESCAPED=$(echo "$VERSION" | sed 's/-/--/g')
-          MAVEN_BADGE="[![Maven](https://img.shields.io/badge/maven-${VERSION_ESCAPED}-blue)](https://github.com/${REPO}/packages)"
+          MAVEN_BADGE="[![Maven Central](https://img.shields.io/badge/maven--central-${VERSION_ESCAPED}-blue)](https://central.sonatype.com/artifact/dev.skymansandy/json-cmp)"
 
           BADGE_LINE="${BUILD_BADGE} ${COVERAGE_BADGE} ${MAVEN_BADGE}"
 
@@ -129,7 +128,7 @@ jobs:
           git push
 
   publish:
-    name: Publish SDK
+    name: Publish to Maven Central
     needs: test-and-coverage
     runs-on: macos-latest
     steps:
@@ -142,11 +141,13 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Publish to GitHub Packages
+      - name: Publish and release to Maven Central
         env:
-          MAVEN_REPO_USERNAME: ${{ github.actor }}
-          MAVEN_REPO_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
+        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
 
   deploy-docs:
     name: Deploy Docs

@@ -2,26 +2,17 @@
 
 ## Repository Setup
 
-JsonCMP is published to GitHub Packages. Add the repository to your `settings.gradle.kts`:
+JsonCMP is published to Maven Central. Add `mavenCentral()` to your repositories in `settings.gradle.kts`:
 
 ```kotlin
 // settings.gradle.kts
 dependencyResolutionManagement {
     repositories {
-        maven {
-            url = uri("https://maven.pkg.github.com/skymansandy/jsonCMP")
-            credentials {
-                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_USERNAME")
-                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+        mavenCentral()
+        google()
     }
 }
 ```
-
-> **Note:** GitHub Packages requires authentication. Add `gpr.user` and `gpr.key` to your
-> `~/.gradle/gradle.properties` or set `GITHUB_USERNAME` and `GITHUB_TOKEN` environment variables.
-> The token needs the `read:packages` scope.
 
 ## Gradle (Kotlin DSL)
 
