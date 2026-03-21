@@ -131,6 +131,7 @@ jobs:
     name: Publish to Maven Central
     needs: test-and-coverage
     runs-on: macos-latest
+    environment: default
     steps:
       - uses: actions/checkout@v4
 
