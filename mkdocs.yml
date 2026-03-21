@@ -8,13 +8,13 @@ theme:
   name: material
   palette:
     - scheme: default
-      primary: teal
+      primary: deep purple
       accent: amber
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: teal
+      primary: deep purple
       accent: amber
       toggle:
         icon: material/brightness-4
@@ -29,6 +29,8 @@ theme:
     - content.tabs.link
     - search.highlight
     - search.share
+  logo: icon-logo.svg
+  favicon: icon.png
   icon:
     repo: fontawesome/brands/github
 

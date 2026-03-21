@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.mokkery) apply false
     alias(libs.plugins.kover)
+    alias(libs.plugins.mavenPublish) apply false
 }
 
 dependencies {
@@ -29,27 +30,40 @@ subprojects {
         val jsoncmpGroup = findProperty("jsoncmp.group") as String
         val jsoncmpVersion = findProperty("jsoncmp.version") as String
 
-        group = jsoncmpGroup
-        version = jsoncmpVersion
-
-        apply(plugin = "maven-publish")
+        apply(plugin = "com.vanniktech.maven.publish")
 
         afterEvaluate {
-            extensions.findByType<PublishingExtension>()?.apply {
-                repositories {
-                    maven {
-                        name = "GitHubPackages"
-                        url = uri(
-                            System.getenv("MAVEN_REPO_URL")
-                                ?: "https://maven.pkg.github.com/skymansandy/jsonCMP"
-                        )
-                        credentials {
-                            username = System.getenv("MAVEN_REPO_USERNAME")
-                                ?: findProperty("gpr.user") as? String ?: ""
-                            password = System.getenv("MAVEN_REPO_PASSWORD")
-                                ?: findProperty("gpr.key") as? String ?: ""
-                        }
+            tasks.withType<Sign>().configureEach {
+                isEnabled = !gradle.startParameter.taskNames.any { it.contains("MavenLocal", ignoreCase = true) }
+            }
+        }
+
+        extensions.configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
+            coordinates(jsoncmpGroup, name, jsoncmpVersion)
+            publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+            signAllPublications()
+
+            pom {
+                name.set("JsonCMP")
+                description.set("Kotlin Multiplatform Compose JSON viewer and editor component")
+                url.set("https://github.com/skymansandy/jsonCMP")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
                     }
+                }
+                developers {
+                    developer {
+                        id.set("skymansandy")
+                        name.set("skymansandy")
+                        email.set("iamsandythedev@gmail.com")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/skymansandy/jsonCMP")
+                    connection.set("scm:git:git://github.com/skymansandy/jsonCMP.git")
+                    developerConnection.set("scm:git:ssh://github.com/skymansandy/jsonCMP.git")
                 }
             }
         }

@@ -148,18 +148,17 @@ private fun LineNumberGutter(
             }
             .padding(start = 12.dp, end = 8.dp),
     ) { measurables, constraints ->
-        val textLayout = textLayoutResult
         val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
         val width = placeables.maxOfOrNull { it.width } ?: 0
-        val height = if (textLayout != null && textLayout.lineCount > 0) {
-            textLayout.getLineBottom(textLayout.lineCount - 1).toInt()
+        val height = if (textLayoutResult.lineCount > 0) {
+            textLayoutResult.getLineBottom(textLayoutResult.lineCount - 1).toInt()
         } else {
             placeables.sumOf { it.height }
         }
 
         layout(width, height) {
             placeables.forEachIndexed { index, placeable ->
-                val y = textLayout?.getLineTop(index)?.toInt() ?: (index * (placeables.firstOrNull()?.height ?: 0))
+                val y = textLayoutResult.getLineTop(index).toInt() ?: (index * (placeables.firstOrNull()?.height ?: 0))
                 placeable.placeRelative(0, y)
             }
         }
