@@ -35,7 +35,7 @@ Then add the dependency:
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("dev.skymansandy:json-cmp:1.0.0-alpha1")
+    implementation("dev.skymansandy:json-cmp:<version>")
 }
 ```
 

@@ -25,7 +25,7 @@ Add the dependency to your KMP module:
     kotlin {
         sourceSets {
             commonMain.dependencies {
-                implementation("dev.skymansandy:json-cmp:1.0.0-alpha2")
+                implementation("dev.skymansandy:json-cmp:<version>")
             }
         }
     }
@@ -36,7 +36,7 @@ Add the dependency to your KMP module:
     ```kotlin
     // build.gradle.kts
     dependencies {
-        implementation("dev.skymansandy:json-cmp:1.0.0-alpha2")
+        implementation("dev.skymansandy:json-cmp:<version>")
     }
     ```
 
