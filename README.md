@@ -8,6 +8,8 @@
 
 Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, and JVM Desktop.
 
+> **⚠️ Experimental:** This library is in an experimental state. APIs may change without notice between releases. Use in production at your own discretion.
+
 ## Features
 
 - **JSON Viewer** — Syntax-highlighted, foldable JSON tree with line numbers

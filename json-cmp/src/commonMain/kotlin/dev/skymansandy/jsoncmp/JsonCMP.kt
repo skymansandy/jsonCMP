@@ -11,9 +11,11 @@ import dev.skymansandy.jsoncmp.component.editor.ErrorBanner
 import dev.skymansandy.jsoncmp.component.viewer.JsonViewer
 import dev.skymansandy.jsoncmp.config.JsonEditorState
 import dev.skymansandy.jsoncmp.config.ThemeOption
+import dev.skymansandy.jsoncmp.helper.annotation.ExperimentalJsonCmpApi
 import dev.skymansandy.jsoncmp.helper.parser.JsonError
 import dev.skymansandy.jsoncmp.model.JsonNode
 
+@ExperimentalJsonCmpApi
 @Composable
 fun JsonCMP(
     modifier: Modifier = Modifier,
@@ -26,7 +28,6 @@ fun JsonCMP(
         error: JsonError?,
     ) -> Unit = { _, _, _ -> },
 ) {
-
     LaunchedEffect(state.rawJson, state.parsedJson, state.error) {
         onJsonChange(state.rawJson, state.parsedJson, state.error)
     }
