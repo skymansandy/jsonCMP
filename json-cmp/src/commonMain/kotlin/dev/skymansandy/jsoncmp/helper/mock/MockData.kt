@@ -70,4 +70,3 @@ internal val previewFoldableLine = JsonLine(
     foldChildCount = 3,
     foldedContent = "\"street\": \"123 Main St\", \"city\": \"New York\" }",
 )
-

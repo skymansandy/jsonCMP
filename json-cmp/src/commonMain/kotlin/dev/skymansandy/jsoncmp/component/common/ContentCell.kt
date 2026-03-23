@@ -49,7 +49,7 @@ internal fun ContentCell(
         val clipboardManager = LocalClipboardManager.current
         val openingBracket = if (line.foldType == FoldType.Object) "{" else "["
         val closingBracket = if (line.foldType == FoldType.Object) "}" else "]"
-        val foldedJson = openingBracket + " " + line.foldedContent
+        val foldedJson = (openingBracket + " " + line.foldedContent).trimEnd(',', ' ')
 
         val prefixText = buildAnnotatedString {
             var cursor = 0
