@@ -9,7 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.skymansandy.jsoncmp.JsonCMP
 import dev.skymansandy.jsoncmp.config.JsonEditorState
-import dev.skymansandy.jsoncmp.config.ThemeOption
+import dev.skymansandy.jsoncmp.config.JsonTheme
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +21,7 @@ class JsonCMPUiTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val theme = ThemeOption.Dark
+    private val theme = JsonTheme.Dark
 
     // ── Viewer mode ──
 

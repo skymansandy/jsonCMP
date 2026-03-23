@@ -39,3 +39,35 @@ internal val previewLines = listOf(
         parentFoldIds = emptyList(),
     ),
 )
+
+internal val previewLine = JsonLine(
+    lineNumber = 2,
+    depth = 1,
+    parts = listOf(
+        JsonPart.Indent("    "),
+        JsonPart.Key("\"name\""),
+        JsonPart.Punct(": "),
+        JsonPart.StrVal("\"John Doe\""),
+        JsonPart.Punct(","),
+    ),
+    foldId = null,
+    foldType = null,
+    parentFoldIds = emptyList(),
+)
+
+internal val previewFoldableLine = JsonLine(
+    lineNumber = 5,
+    depth = 1,
+    parts = listOf(
+        JsonPart.Indent("    "),
+        JsonPart.Key("\"address\""),
+        JsonPart.Punct(": "),
+        JsonPart.Punct("{"),
+    ),
+    foldId = 1,
+    foldType = FoldType.Object,
+    parentFoldIds = emptyList(),
+    foldChildCount = 3,
+    foldedContent = "\"street\": \"123 Main St\", \"city\": \"New York\" }",
+)
+

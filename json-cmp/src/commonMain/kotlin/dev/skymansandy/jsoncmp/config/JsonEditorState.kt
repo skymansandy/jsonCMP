@@ -89,6 +89,10 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
         parsedJson = node
         error = err
         if (node != null) {
+            val normalized = node.toJsonString(compact = isCompact)
+            if (normalized != rawJson) {
+                rawJson = normalized
+            }
             allLines = buildDisplayLines(node)
             val validIds = allLines.mapNotNull { it.foldId }.toSet()
             foldState.keys.removeAll { it !in validIds }

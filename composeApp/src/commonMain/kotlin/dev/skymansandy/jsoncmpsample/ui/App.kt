@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.JsonCMP
-import dev.skymansandy.jsoncmp.config.ThemeOption
+import dev.skymansandy.jsoncmp.config.JsonTheme
 import dev.skymansandy.jsoncmp.config.rememberJsonEditorState
 import dev.skymansandy.jsoncmpsample.data.sampleJson
 
@@ -48,13 +48,13 @@ fun App() {
         ) {
             var searchQuery by remember { mutableStateOf("") }
             val themes = listOf(
-                ThemeOption.Dark,
-                ThemeOption.Light,
-                ThemeOption.Monokai,
-                ThemeOption.Dracula,
-                ThemeOption.SolarizedDark,
+                JsonTheme.Dark,
+                JsonTheme.Light,
+                JsonTheme.Monokai,
+                JsonTheme.Dracula,
+                JsonTheme.SolarizedDark,
             )
-            var selectedTheme by remember { mutableStateOf<ThemeOption>(ThemeOption.Dark) }
+            var selectedTheme by remember { mutableStateOf<JsonTheme>(JsonTheme.Dark) }
             val state = rememberJsonEditorState(
                 initialJson = sampleJson,
                 isEditing = true,
@@ -62,7 +62,6 @@ fun App() {
 
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
                     .fillMaxSize()
                     .background(selectedTheme.colors.background)
                     .padding(it),
@@ -112,7 +111,9 @@ fun App() {
                 }
 
                 JsonCMP(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
                     state = state,
                     searchQuery = searchQuery,
                     theme = selectedTheme,

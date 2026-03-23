@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import dev.skymansandy.jsoncmp.component.editor.JsonEditor
 import dev.skymansandy.jsoncmp.component.viewer.JsonViewer
 import dev.skymansandy.jsoncmp.config.JsonEditorState
-import dev.skymansandy.jsoncmp.config.ThemeOption
+import dev.skymansandy.jsoncmp.config.JsonTheme
 import dev.skymansandy.jsoncmp.helper.annotation.ExperimentalJsonCmpApi
 import dev.skymansandy.jsoncmp.helper.parser.JsonError
 import dev.skymansandy.jsoncmp.model.JsonNode
@@ -19,7 +19,7 @@ fun JsonCMP(
     modifier: Modifier = Modifier,
     state: JsonEditorState,
     searchQuery: String = "",
-    theme: ThemeOption = ThemeOption.Dark,
+    theme: JsonTheme = JsonTheme.Dark,
     onJsonChange: (
         json: String,
         parsed: JsonNode?,
