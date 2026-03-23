@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,7 +46,6 @@ internal fun CodeEditor(
     }
 
     val horizontalScrollState = rememberScrollState()
-    val verticalScrollState = rememberScrollState()
     val lineCount = remember(textFieldValue.text) { textFieldValue.text.count { it == '\n' } + 1 }
     val numDigits = remember(lineCount) { lineCount.toString().length }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -64,7 +62,6 @@ internal fun CodeEditor(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 200.dp)
-            .verticalScroll(verticalScrollState)
             .background(colors.background),
     ) {
         // Line number gutter — positioned using actual text layout line offsets
