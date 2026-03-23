@@ -42,19 +42,24 @@ fun App() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("JsonCMP Sample") },
+                    title = {
+                        Text("JsonCMP Sample")
+                    },
                 )
             },
         ) {
             var searchQuery by remember { mutableStateOf("") }
-            val themes = listOf(
-                JsonTheme.Dark,
-                JsonTheme.Light,
-                JsonTheme.Monokai,
-                JsonTheme.Dracula,
-                JsonTheme.SolarizedDark,
-            )
             var selectedTheme by remember { mutableStateOf<JsonTheme>(JsonTheme.Dark) }
+            val themes = remember {
+                listOf(
+                    JsonTheme.Dark,
+                    JsonTheme.Light,
+                    JsonTheme.Monokai,
+                    JsonTheme.Dracula,
+                    JsonTheme.SolarizedDark,
+                )
+            }
+
             val state = rememberJsonEditorState(
                 initialJson = sampleJson,
                 isEditing = true,
