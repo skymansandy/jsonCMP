@@ -15,7 +15,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.helper.constants.cellVerticalPadding
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.colors.partColor
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
@@ -102,8 +101,6 @@ internal fun ContentCell(
                 .padding(
                     start = 8.dp,
                     end = 16.dp,
-                    top = cellVerticalPadding,
-                    bottom = cellVerticalPadding,
                 ),
         )
     } else {
@@ -138,8 +135,6 @@ internal fun ContentCell(
                 .padding(
                     start = 8.dp,
                     end = 16.dp,
-                    top = cellVerticalPadding,
-                    bottom = cellVerticalPadding,
                 ),
         )
     }

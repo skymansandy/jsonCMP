@@ -8,9 +8,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.skymansandy.jsoncmp.component.common.GutterCell
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
-import dev.skymansandy.jsoncmp.model.FoldType
-import dev.skymansandy.jsoncmp.model.JsonLine
-import dev.skymansandy.jsoncmp.model.JsonPart
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
 import org.junit.Test
@@ -24,45 +21,14 @@ class GutterCellUiTest {
 
     private val colors = JsonCmpColors.Dark
 
-    private val nonFoldableLine = JsonLine(
-        lineNumber = 5,
-        depth = 1,
-        parts = listOf(
-            JsonPart.Indent("  "),
-            JsonPart.Key("\"name\""),
-            JsonPart.Punct(": "),
-            JsonPart.StrVal("\"John\""),
-        ),
-        foldId = null,
-        foldType = null,
-        parentFoldIds = emptyList(),
-    )
-
-    private val foldableLine = JsonLine(
-        lineNumber = 3,
-        depth = 1,
-        parts = listOf(
-            JsonPart.Indent("  "),
-            JsonPart.Key("\"address\""),
-            JsonPart.Punct(": "),
-            JsonPart.Punct("{"),
-        ),
-        foldId = 1,
-        foldType = FoldType.Object,
-        parentFoldIds = emptyList(),
-        foldChildCount = 2,
-    )
-
     @Test
     fun displaysLineNumber() {
         composeTestRule.setContent {
             MaterialTheme {
                 GutterCell(
-                    line = nonFoldableLine,
-                    isFolded = false,
+                    lineNumber = 5,
                     numDigits = 2,
                     colors = colors,
-                    onFoldToggle = {},
                 )
             }
         }
@@ -75,11 +41,9 @@ class GutterCellUiTest {
         composeTestRule.setContent {
             MaterialTheme {
                 GutterCell(
-                    line = nonFoldableLine,
-                    isFolded = false,
+                    lineNumber = 5,
                     numDigits = 3,
                     colors = colors,
-                    onFoldToggle = {},
                 )
             }
         }
@@ -92,10 +56,11 @@ class GutterCellUiTest {
         composeTestRule.setContent {
             MaterialTheme {
                 GutterCell(
-                    line = foldableLine,
-                    isFolded = false,
+                    lineNumber = 3,
                     numDigits = 2,
                     colors = colors,
+                    foldId = 1,
+                    isFolded = false,
                     onFoldToggle = {},
                 )
             }
@@ -109,10 +74,11 @@ class GutterCellUiTest {
         composeTestRule.setContent {
             MaterialTheme {
                 GutterCell(
-                    line = foldableLine,
-                    isFolded = true,
+                    lineNumber = 3,
                     numDigits = 2,
                     colors = colors,
+                    foldId = 1,
+                    isFolded = true,
                     onFoldToggle = {},
                 )
             }
@@ -126,11 +92,9 @@ class GutterCellUiTest {
         composeTestRule.setContent {
             MaterialTheme {
                 GutterCell(
-                    line = nonFoldableLine,
-                    isFolded = false,
+                    lineNumber = 5,
                     numDigits = 2,
                     colors = colors,
-                    onFoldToggle = {},
                 )
             }
         }
@@ -146,10 +110,11 @@ class GutterCellUiTest {
         composeTestRule.setContent {
             MaterialTheme {
                 GutterCell(
-                    line = foldableLine,
-                    isFolded = false,
+                    lineNumber = 3,
                     numDigits = 2,
                     colors = colors,
+                    foldId = 1,
+                    isFolded = false,
                     onFoldToggle = { toggled = true },
                 )
             }

@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.helper.constants.cellVerticalPadding
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.foldGlyphSize
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
@@ -45,8 +44,6 @@ internal fun GutterCell(
             modifier = Modifier.padding(
                 start = 12.dp,
                 end = 6.dp,
-                top = cellVerticalPadding,
-                bottom = cellVerticalPadding,
             ),
         )
         if (foldId != null) {
