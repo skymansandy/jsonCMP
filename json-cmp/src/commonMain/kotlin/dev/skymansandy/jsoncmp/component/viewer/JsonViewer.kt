@@ -1,7 +1,9 @@
 package dev.skymansandy.jsoncmp.component.viewer
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -11,7 +13,10 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.component.common.ContentCell
 import dev.skymansandy.jsoncmp.component.common.GutterCell
 import dev.skymansandy.jsoncmp.component.common.PlainText
@@ -53,16 +58,28 @@ internal fun JsonViewer(
     SelectionContainer(
         modifier = modifier,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            for (line in visibleLines) {
-                val isFolded = line.foldId != null && foldState[line.foldId] == true
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
+            val borderColor = colors.gutterBorder
+            DisableSelection {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .background(colors.gutterBackground)
+                        .drawBehind {
+                            val x = size.width
+                            drawLine(
+                                borderColor,
+                                Offset(x, 0f),
+                                Offset(x, size.height),
+                                strokeWidth = 1.dp.toPx(),
+                            )
+                        },
                 ) {
-                    DisableSelection {
+                    for (line in visibleLines) {
+                        val isFolded =
+                            line.foldId != null && foldState[line.foldId] == true
                         GutterCell(
                             line = line,
                             isFolded = isFolded,
@@ -75,9 +92,16 @@ internal fun JsonViewer(
                             },
                         )
                     }
+                }
+            }
 
+            Column(
+                modifier = Modifier.weight(1f),
+            ) {
+                for (line in visibleLines) {
+                    val isFolded =
+                        line.foldId != null && foldState[line.foldId] == true
                     ContentCell(
-                        modifier = Modifier.weight(1f),
                         line = line,
                         isFolded = isFolded,
                         searchQuery = searchQuery,

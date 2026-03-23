@@ -7,7 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
@@ -19,9 +19,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.Layout
@@ -117,6 +117,7 @@ private fun LineNumberGutter(
         // Fallback: render without alignment until layout is available
         Box(
             modifier = Modifier
+                .fillMaxHeight()
                 .background(colors.gutterBackground)
                 .drawBehind {
                     val x = size.width
@@ -151,6 +152,7 @@ private fun LineNumberGutter(
             }
         },
         modifier = Modifier
+            .fillMaxHeight()
             .background(colors.gutterBackground)
             .drawBehind {
                 val x = size.width
@@ -160,11 +162,12 @@ private fun LineNumberGutter(
     ) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
         val width = placeables.maxOfOrNull { it.width } ?: 0
-        val height = if (textLayoutResult.lineCount > 0) {
+        val contentHeight = if (textLayoutResult.lineCount > 0) {
             textLayoutResult.getLineBottom(textLayoutResult.lineCount - 1).toInt()
         } else {
             placeables.sumOf { it.height }
         }
+        val height = maxOf(contentHeight, constraints.maxHeight)
 
         layout(width, height) {
             placeables.forEachIndexed { index, placeable ->

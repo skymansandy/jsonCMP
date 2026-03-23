@@ -28,9 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.JsonCMP
+import dev.skymansandy.jsoncmp.config.ThemeOption
 import dev.skymansandy.jsoncmp.config.rememberJsonEditorState
 import dev.skymansandy.jsoncmpsample.data.sampleJson
-import dev.skymansandy.jsoncmp.config.ThemeOption
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

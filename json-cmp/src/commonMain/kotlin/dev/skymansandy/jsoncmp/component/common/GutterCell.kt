@@ -1,6 +1,5 @@
 package dev.skymansandy.jsoncmp.component.common
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,8 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,14 +35,8 @@ internal fun GutterCell(
         isFolded -> "▶"
         else -> "▼"
     }
-    val borderColor = colors.gutterBorder
     Row(
-        modifier = Modifier
-            .background(colors.gutterBackground)
-            .drawBehind {
-                val x = size.width
-                drawLine(borderColor, Offset(x, 0f), Offset(x, size.height), strokeWidth = 1.dp.toPx())
-            },
+        modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
