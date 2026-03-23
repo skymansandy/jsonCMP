@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.JsonCMP
 import dev.skymansandy.jsoncmp.config.rememberJsonEditorState
 import dev.skymansandy.jsoncmpsample.data.sampleJson
-import dev.skymansandy.jsoncmpsample.model.ThemeOption
+import dev.skymansandy.jsoncmp.config.ThemeOption
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +46,14 @@ fun App() {
             },
         ) {
             var searchQuery by remember { mutableStateOf("") }
-            var selectedTheme by remember { mutableStateOf(ThemeOption.Dark) }
+            val themes = listOf(
+                ThemeOption.Dark,
+                ThemeOption.Light,
+                ThemeOption.Monokai,
+                ThemeOption.Dracula,
+                ThemeOption.SolarizedDark,
+            )
+            var selectedTheme by remember { mutableStateOf<ThemeOption>(ThemeOption.Dark) }
             val state = rememberJsonEditorState(
                 initialJson = sampleJson,
                 isEditing = true,
@@ -65,7 +72,7 @@ fun App() {
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    ThemeOption.entries.forEach { theme ->
+                    themes.forEach { theme ->
                         FilterChip(
                             selected = selectedTheme == theme,
                             onClick = { selectedTheme = theme },
@@ -108,7 +115,7 @@ fun App() {
                         .weight(1f),
                     state = state,
                     searchQuery = searchQuery,
-                    colors = selectedTheme.colors,
+                    theme = selectedTheme,
                 )
             }
         }

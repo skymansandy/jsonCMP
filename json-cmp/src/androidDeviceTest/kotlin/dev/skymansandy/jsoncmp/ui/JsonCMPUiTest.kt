@@ -9,7 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.skymansandy.jsoncmp.JsonCMP
 import dev.skymansandy.jsoncmp.config.JsonEditorState
-import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
+import dev.skymansandy.jsoncmp.config.ThemeOption
 import io.kotest.matchers.shouldBe
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +21,7 @@ class JsonCMPUiTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val colors = JsonCmpColors.Dark
+    private val theme = ThemeOption.Dark
 
     // ── Viewer mode ──
 
@@ -31,7 +31,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -45,7 +45,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -58,7 +58,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -71,7 +71,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -86,7 +86,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -99,7 +99,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -112,7 +112,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -125,7 +125,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -144,7 +144,7 @@ class JsonCMPUiTest {
             MaterialTheme {
                 JsonCMP(
                     state = state,
-                    colors = colors,
+                    theme = theme,
                     onJsonChange = { j, _, _ -> receivedJson = j },
                 )
             }
@@ -162,7 +162,7 @@ class JsonCMPUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, colors = colors)
+                JsonCMP(state = state, theme = theme)
             }
         }
 
@@ -184,7 +184,7 @@ class JsonCMPUiTest {
                 JsonCMP(
                     state = state,
                     searchQuery = "John",
-                    colors = colors,
+                    theme = theme,
                 )
             }
         }

@@ -9,7 +9,7 @@ import dev.skymansandy.jsoncmp.component.editor.EditorToolbar
 import dev.skymansandy.jsoncmp.component.editor.ErrorBanner
 import dev.skymansandy.jsoncmp.component.viewer.JsonViewer
 import dev.skymansandy.jsoncmp.config.JsonEditorState
-import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
+import dev.skymansandy.jsoncmp.config.ThemeOption
 import dev.skymansandy.jsoncmp.helper.parser.JsonError
 import dev.skymansandy.jsoncmp.model.JsonNode
 
@@ -18,7 +18,7 @@ fun JsonCMP(
     modifier: Modifier = Modifier,
     state: JsonEditorState,
     searchQuery: String = "",
-    colors: JsonCmpColors = JsonCmpColors.Dark,
+    theme: ThemeOption = ThemeOption.Dark,
     onJsonChange: (
         json: String,
         parsed: JsonNode?,
@@ -36,24 +36,24 @@ fun JsonCMP(
         if (state.isEditing) {
             EditorToolbar(
                 state = state,
-                colors = colors,
+                colors = theme.colors,
             )
 
             ErrorBanner(
                 error = state.error,
-                colors = colors,
+                colors = theme.colors,
             )
 
             CodeEditor(
                 state = state,
                 searchQuery = searchQuery,
-                colors = colors,
+                colors = theme.colors,
             )
         } else {
             JsonViewer(
                 state = state,
                 searchQuery = searchQuery,
-                colors = colors,
+                colors = theme.colors,
             )
         }
     }
