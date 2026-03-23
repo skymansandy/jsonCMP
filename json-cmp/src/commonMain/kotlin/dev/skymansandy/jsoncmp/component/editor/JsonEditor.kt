@@ -26,14 +26,13 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.component.common.LineGutter
 import dev.skymansandy.jsoncmp.component.common.highlightJson
 import dev.skymansandy.jsoncmp.config.JsonEditorState
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
 
 @Composable
-internal fun CodeEditor(
+internal fun JsonEditor(
     modifier: Modifier = Modifier,
     state: JsonEditorState,
     searchQuery: String,
@@ -85,7 +84,7 @@ internal fun CodeEditor(
                 .then(scrollModifier),
         ) {
             // Line number gutter — positioned using actual text layout line offsets
-            LineGutter(
+            LineGutterEditMode(
                 lineCount = lineCount,
                 textLayoutResult = textLayoutResult,
                 colors = colors,
@@ -127,9 +126,9 @@ private val previewColors = JsonCmpColors.Dark
 
 @Preview
 @Composable
-private fun Preview_CodeEditor() {
+private fun Preview_JsonEditor() {
     MaterialTheme {
-        CodeEditor(
+        JsonEditor(
             state = JsonEditorState(
                 initialJson = previewJson,
                 isEditing = true,
@@ -142,9 +141,9 @@ private fun Preview_CodeEditor() {
 
 @Preview
 @Composable
-private fun Preview_CodeEditorWithSearch() {
+private fun Preview_JsonEditorWithSearch() {
     MaterialTheme {
-        CodeEditor(
+        JsonEditor(
             state = JsonEditorState(
                 initialJson = previewJson,
                 isEditing = true,

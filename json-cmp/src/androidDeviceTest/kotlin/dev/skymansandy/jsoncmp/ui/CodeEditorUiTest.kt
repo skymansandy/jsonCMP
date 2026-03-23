@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import dev.skymansandy.jsoncmp.component.editor.CodeEditor
+import dev.skymansandy.jsoncmp.component.editor.JsonEditor
 import dev.skymansandy.jsoncmp.config.JsonEditorState
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import org.junit.Rule
@@ -26,7 +26,7 @@ class CodeEditorUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                CodeEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, searchQuery = "", colors = colors)
             }
         }
 
@@ -41,7 +41,7 @@ class CodeEditorUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                CodeEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, searchQuery = "", colors = colors)
             }
         }
 
@@ -54,7 +54,7 @@ class CodeEditorUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                CodeEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, searchQuery = "", colors = colors)
             }
         }
 
@@ -70,7 +70,7 @@ class CodeEditorUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                CodeEditor(state = state, searchQuery = "John", colors = colors)
+                JsonEditor(state = state, searchQuery = "John", colors = colors)
             }
         }
 
@@ -83,7 +83,7 @@ class CodeEditorUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                CodeEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, searchQuery = "", colors = colors)
             }
         }
 
@@ -110,7 +110,7 @@ class CodeEditorUiTest {
 
         composeTestRule.setContent {
             MaterialTheme {
-                CodeEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, searchQuery = "", colors = colors)
             }
         }
 

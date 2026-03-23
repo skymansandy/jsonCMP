@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
+import dev.skymansandy.jsoncmp.helper.mock.previewColors
 
 @Composable
 internal fun PlainText(
@@ -59,9 +60,6 @@ internal fun PlainText(
 }
 
 // ── Previews ──
-
-private val previewColors = JsonCmpColors.Dark
-
 @Preview
 @Composable
 private fun Preview_PlainText() {

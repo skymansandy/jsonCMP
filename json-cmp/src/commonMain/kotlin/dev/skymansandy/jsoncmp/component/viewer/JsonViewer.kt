@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.component.common.ContentCell
-import dev.skymansandy.jsoncmp.component.common.LineGutter
 import dev.skymansandy.jsoncmp.component.common.PlainText
 import dev.skymansandy.jsoncmp.config.JsonEditorState
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
@@ -66,8 +65,9 @@ internal fun JsonViewer(
                     .fillMaxWidth()
                     .then(scrollModifier),
             ) {
-                LineGutter(
+                LineGutterViewMode(
                     lines = visibleLines,
+                    totalLineCount = allLines.size,
                     foldState = foldState,
                     colors = colors,
                     gutterMinHeight = gutterMinHeight,

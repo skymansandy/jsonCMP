@@ -17,30 +17,29 @@ import dev.skymansandy.jsoncmp.helper.constants.cellVerticalPadding
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.foldGlyphSize
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
-import dev.skymansandy.jsoncmp.model.FoldType
-import dev.skymansandy.jsoncmp.model.JsonLine
-import dev.skymansandy.jsoncmp.model.JsonPart
+import dev.skymansandy.jsoncmp.helper.mock.previewColors
 
 @Composable
 internal fun GutterCell(
-    line: JsonLine,
-    isFolded: Boolean,
+    lineNumber: Int,
     numDigits: Int,
     colors: JsonCmpColors,
-    onFoldToggle: () -> Unit,
+    foldId: Int? = null,
+    isFolded: Boolean = false,
+    onFoldToggle: () -> Unit = {},
 ) {
-
     val foldGlyph = when {
-        line.foldId == null -> ""
+        foldId == null -> ""
         isFolded -> "▶"
         else -> "▼"
     }
+
     Row(
         modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = line.lineNumber.toString().padStart(numDigits),
+            text = lineNumber.toString().padStart(numDigits),
             style = monoStyle,
             color = colors.lineNumber,
             modifier = Modifier.padding(
@@ -50,17 +49,13 @@ internal fun GutterCell(
                 bottom = cellVerticalPadding,
             ),
         )
-        Box(
-            modifier = Modifier
-                .size(foldGlyphSize)
-                .then(
-                    if (line.foldId != null) {
-                        Modifier.pointerInput(line.foldId) { detectTapGestures { onFoldToggle() } }
-                    } else Modifier,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (foldGlyph.isNotEmpty()) {
+        if (foldId != null) {
+            Box(
+                modifier = Modifier
+                    .size(foldGlyphSize)
+                    .pointerInput(foldId) { detectTapGestures { onFoldToggle() } },
+                contentAlignment = Alignment.Center,
+            ) {
                 Text(
                     text = foldGlyph,
                     style = monoStyle,
@@ -73,47 +68,14 @@ internal fun GutterCell(
 
 // ── Previews ──
 
-private val previewColors = JsonCmpColors.Dark
-
-private val previewLine = JsonLine(
-    lineNumber = 2,
-    depth = 1,
-    parts = listOf(
-        JsonPart.Indent("    "),
-        JsonPart.Key("\"name\""),
-        JsonPart.Punct(": "),
-        JsonPart.StrVal("\"John Doe\""),
-    ),
-    foldId = null,
-    foldType = null,
-    parentFoldIds = emptyList(),
-)
-
-private val previewFoldableLine = JsonLine(
-    lineNumber = 5,
-    depth = 1,
-    parts = listOf(
-        JsonPart.Indent("    "),
-        JsonPart.Key("\"address\""),
-        JsonPart.Punct(": "),
-        JsonPart.Punct("{"),
-    ),
-    foldId = 1,
-    foldType = FoldType.Object,
-    parentFoldIds = emptyList(),
-    foldChildCount = 3,
-)
-
 @Preview
 @Composable
 private fun Preview_GutterCell() {
     MaterialTheme {
         GutterCell(
-            line = previewLine,
-            isFolded = false,
+            lineNumber = 2,
             numDigits = 2,
             colors = previewColors,
-            onFoldToggle = {},
         )
     }
 }
@@ -123,10 +85,11 @@ private fun Preview_GutterCell() {
 private fun Preview_GutterCellFoldable() {
     MaterialTheme {
         GutterCell(
-            line = previewFoldableLine,
-            isFolded = false,
+            lineNumber = 5,
             numDigits = 2,
             colors = previewColors,
+            foldId = 1,
+            isFolded = false,
             onFoldToggle = {},
         )
     }
@@ -137,10 +100,11 @@ private fun Preview_GutterCellFoldable() {
 private fun Preview_GutterCellFolded() {
     MaterialTheme {
         GutterCell(
-            line = previewFoldableLine,
-            isFolded = true,
+            lineNumber = 5,
             numDigits = 2,
             colors = previewColors,
+            foldId = 1,
+            isFolded = true,
             onFoldToggle = {},
         )
     }
