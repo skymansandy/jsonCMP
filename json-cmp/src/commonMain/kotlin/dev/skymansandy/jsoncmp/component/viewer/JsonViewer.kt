@@ -1,12 +1,15 @@
 package dev.skymansandy.jsoncmp.component.viewer
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -58,25 +61,34 @@ internal fun JsonViewer(
     SelectionContainer(
         modifier = modifier,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            val borderColor = colors.gutterBorder
-            DisableSelection {
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .background(colors.gutterBackground)
-                        .drawBehind {
-                            val x = size.width
-                            drawLine(
-                                borderColor,
-                                Offset(x, 0f),
-                                Offset(x, size.height),
-                                strokeWidth = 1.dp.toPx(),
-                            )
-                        },
-                ) {
+        BoxWithConstraints {
+            val hasBoundedHeight = constraints.hasBoundedHeight
+            val scrollModifier = if (hasBoundedHeight) {
+                Modifier.verticalScroll(rememberScrollState())
+            } else {
+                Modifier
+            }
+            val gutterMinHeight = if (hasBoundedHeight) maxHeight else 0.dp
+
+            Row(
+                modifier = Modifier.fillMaxWidth().then(scrollModifier),
+            ) {
+                val borderColor = colors.gutterBorder
+                DisableSelection {
+                    Column(
+                        modifier = Modifier
+                            .defaultMinSize(minHeight = gutterMinHeight)
+                            .background(colors.gutterBackground)
+                            .drawBehind {
+                                val x = size.width
+                                drawLine(
+                                    borderColor,
+                                    Offset(x, 0f),
+                                    Offset(x, size.height),
+                                    strokeWidth = 1.dp.toPx(),
+                                )
+                            },
+                    ) {
                     for (line in visibleLines) {
                         val isFolded =
                             line.foldId != null && foldState[line.foldId] == true
@@ -114,6 +126,7 @@ internal fun JsonViewer(
                     )
                 }
             }
+        }
         }
     }
 }

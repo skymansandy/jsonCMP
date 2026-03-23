@@ -2,29 +2,70 @@ package dev.skymansandy.jsoncmpsample.data
 
 val sampleJson = """
 {
-    "name": "JsonCMP",
-    "version": "1.0.0",
-    "description": "Kotlin Multiplatform Compose JSON viewer and editor",
-    "platforms": ["Android", "iOS", "JVM Desktop"],
-    "features": {
-        "viewer": true,
-        "editor": true,
-        "search": true,
-        "folding": true,
-        "sorting": true
+    "name": "John Doe",
+    "age": 30,
+    "isActive": true,
+    "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "zip": {
+            "name": "John Doe",
+            "age": 30,
+            "isActive": true,
+            "address": {
+                "street": "123 Main St",
+                "city": "New York",
+                "zip": "10001"
+            },
+            "tags": ["developer", "kotlin", "compose"],
+            "score": {
+                "name": "John Doe",
+                "age": 30,
+                "isActive": true,
+                "address": {
+                    "street": "123 Main St",
+                    "city": "New York",
+                    "zip": "10001"
+                },
+                "tags": ["developer", "kotlin", "compose"],
+                "score": {
+    "name": "John Doe",
+    "age": 30,
+    "isActive": true,
+    "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "zip": {
+            "name": "John Doe",
+            "age": 30,
+            "isActive": true,
+            "address": {
+                "street": "123 Main St",
+                "city": "New York",
+                "zip": "10001"
+            },
+            "tags": ["developer", "kotlin", "compose"],
+            "score": {
+                "name": "John Doe",
+                "age": 30,
+                "isActive": true,
+                "address": {
+                    "street": "123 Main St",
+                    "city": "New York",
+                    "zip": "10001"
+                },
+                "tags": ["developer", "kotlin", "compose"],
+                "score": null
+            }
+        }
     },
-    "themes": [
-        {"name": "Dark", "type": "dark"},
-        {"name": "Light", "type": "light"},
-        {"name": "Monokai", "type": "dark"},
-        {"name": "Dracula", "type": "dark"},
-        {"name": "Solarized Dark", "type": "dark"}
-    ],
-    "author": {
-        "name": "skymansandy",
-        "github": "https://github.com/skymansandy"
+    "tags": ["developer", "kotlin", "compose"],
+    "score": null
+}
+            }
+        }
     },
-    "license": "Apache-2.0",
-    "stars": null
+    "tags": ["developer", "kotlin", "compose"],
+    "score": null
 }
 """.trimIndent()
