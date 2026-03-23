@@ -20,6 +20,7 @@ import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 
 @Composable
 internal fun JsonViewer(
+    modifier: Modifier = Modifier,
     state: JsonEditorState,
     searchQuery: String,
     colors: JsonCmpColors,
@@ -29,6 +30,7 @@ internal fun JsonViewer(
 
     if (allLines.isEmpty()) {
         PlainText(
+            modifier = modifier,
             text = state.rawJson,
             searchQuery = searchQuery,
             colors = colors,
@@ -49,7 +51,7 @@ internal fun JsonViewer(
     }
 
     SelectionContainer(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
     ) {
         Column(
             modifier = Modifier

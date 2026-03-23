@@ -1,7 +1,9 @@
 package dev.skymansandy.jsoncmp.component.editor
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -17,6 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
@@ -33,6 +37,7 @@ import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
 
 @Composable
 internal fun CodeEditor(
+    modifier: Modifier = Modifier,
     state: JsonEditorState,
     searchQuery: String,
     colors: JsonCmpColors,
@@ -50,6 +55,8 @@ internal fun CodeEditor(
     val numDigits = remember(lineCount) { lineCount.toString().length }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
+    val focusRequester = remember { FocusRequester() }
+
     val highlighted: AnnotatedString = remember(textFieldValue.text, searchQuery, colors) {
         highlightJson(
             text = textFieldValue.text,
@@ -59,10 +66,15 @@ internal fun CodeEditor(
     }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .defaultMinSize(minHeight = 200.dp)
-            .background(colors.background),
+            .background(colors.background)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                focusRequester.requestFocus()
+            },
     ) {
         // Line number gutter — positioned using actual text layout line offsets
         val borderColor = colors.gutterBorder
@@ -86,6 +98,7 @@ internal fun CodeEditor(
             cursorBrush = SolidColor(colors.key),
             modifier = Modifier
                 .weight(1f)
+                .focusRequester(focusRequester)
                 .horizontalScroll(horizontalScrollState)
                 .padding(start = 8.dp, end = 16.dp),
         )

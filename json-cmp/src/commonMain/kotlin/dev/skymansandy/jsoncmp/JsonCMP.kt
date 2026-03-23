@@ -1,6 +1,7 @@
 package dev.skymansandy.jsoncmp
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -45,12 +46,14 @@ fun JsonCMP(
             )
 
             CodeEditor(
+                modifier = Modifier.fillMaxSize(),
                 state = state,
                 searchQuery = searchQuery,
                 colors = theme.colors,
             )
         } else {
             JsonViewer(
+                modifier = Modifier.fillMaxSize(),
                 state = state,
                 searchQuery = searchQuery,
                 colors = theme.colors,
