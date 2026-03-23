@@ -24,6 +24,10 @@ fun JsonCMP(
         error: JsonError?,
     ) -> Unit = { _, _, _ -> },
 ) {
+    LaunchedEffect(state.rawJson) {
+        state.parseJsonElement(state.rawJson)
+    }
+
     LaunchedEffect(state.rawJson, state.parsedJson, state.error) {
         onJsonChange(state.rawJson, state.parsedJson, state.error)
     }

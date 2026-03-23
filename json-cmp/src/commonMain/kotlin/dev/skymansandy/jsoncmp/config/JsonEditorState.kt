@@ -15,6 +15,8 @@ import dev.skymansandy.jsoncmp.helper.serializer.sortKeys
 import dev.skymansandy.jsoncmp.helper.serializer.toJsonString
 import dev.skymansandy.jsoncmp.model.JsonLine
 import dev.skymansandy.jsoncmp.model.JsonNode
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Stable
 class JsonEditorState(initialJson: String, isEditing: Boolean) {
@@ -38,10 +40,6 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
     internal var allLines: List<JsonLine> by mutableStateOf(emptyList())
         private set
 
-    init {
-        reparse(initialJson)
-    }
-
     fun collapseAll() {
         allLines.forEach { line ->
             line.foldId?.let { foldState[it] = true }
@@ -50,11 +48,6 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
 
     fun expandAll() {
         foldState.clear()
-    }
-
-    fun updateRawJson(newJson: String) {
-        rawJson = newJson
-        reparse(newJson)
     }
 
     fun format(compact: Boolean) {
@@ -73,13 +66,13 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
         rawJson = sorted.toJsonString(compact = isCompact)
     }
 
-    private fun reparse(json: String) {
+    suspend fun parseJsonElement(json: String) = withContext(Dispatchers.Default) {
         val trimmed = json.trim()
         if (trimmed.isEmpty()) {
             parsedJson = null
             error = null
             allLines = emptyList()
-            return
+            return@withContext
         }
 
         val (node, err) = parseJsonResult(trimmed)

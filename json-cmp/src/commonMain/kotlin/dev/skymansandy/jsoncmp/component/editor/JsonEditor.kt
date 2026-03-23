@@ -14,10 +14,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -31,7 +33,11 @@ import dev.skymansandy.jsoncmp.component.common.highlightJson
 import dev.skymansandy.jsoncmp.config.JsonEditorState
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(FlowPreview::class)
 @Composable
 internal fun JsonEditor(
     modifier: Modifier = Modifier,
@@ -51,8 +57,16 @@ internal fun JsonEditor(
     val lineCount = remember(textFieldValue.text) { textFieldValue.text.count { it == '\n' } + 1 }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
-    val focusRequester = remember { FocusRequester() }
+    var rawJson: String by mutableStateOf(state.rawJson)
+    LaunchedEffect(Unit) {
+        snapshotFlow { rawJson }
+            .debounce(450.milliseconds) // doherty threshold
+            .collect {
+                state.parseJsonElement(it)
+            }
+    }
 
+    val focusRequester = remember { FocusRequester() }
     val highlighted: AnnotatedString = remember(textFieldValue.text, searchQuery, colors) {
         highlightJson(
             text = textFieldValue.text,
@@ -109,7 +123,7 @@ internal fun JsonEditor(
                     onValueChange = { newValue ->
                         textFieldValue = newValue
                         lastSyncedRaw = newValue.text
-                        state.updateRawJson(newValue.text)
+                        rawJson = newValue.text
                     },
                     onTextLayout = { textLayoutResult = it },
                     textStyle = monoStyle,

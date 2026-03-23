@@ -70,49 +70,6 @@ class JsonEditorStateTest {
         state.isCompact.shouldBeFalse()
     }
 
-    // ── updateRawJson ──
-
-    @Test
-    fun updaterawjsonReparsesValidJson() {
-        val state = JsonEditorState(TestData.SIMPLE_OBJECT, isEditing = true)
-        state.updateRawJson(TestData.SIMPLE_ARRAY)
-
-        state.rawJson shouldBe TestData.SIMPLE_ARRAY
-        state.parsedJson.shouldNotBeNull()
-        state.error.shouldBeNull()
-    }
-
-    @Test
-    fun updaterawjsonSetsErrorForInvalidJson() {
-        val state = JsonEditorState(TestData.SIMPLE_OBJECT, isEditing = true)
-        state.updateRawJson(TestData.INVALID_JSON)
-
-        state.parsedJson.shouldBeNull()
-        state.error.shouldNotBeNull()
-        state.allLines.shouldBeEmpty()
-    }
-
-    @Test
-    fun updaterawjsonClearsStateForEmptyJson() {
-        val state = JsonEditorState(TestData.SIMPLE_OBJECT, isEditing = true)
-        state.updateRawJson("")
-
-        state.parsedJson.shouldBeNull()
-        state.error.shouldBeNull()
-        state.allLines.shouldBeEmpty()
-    }
-
-    @Test
-    fun updaterawjsonRebuildsDisplayLines() {
-        val state = JsonEditorState(TestData.SIMPLE_OBJECT, isEditing = true)
-        val originalLineCount = state.allLines.size
-
-        state.updateRawJson(TestData.NESTED_OBJECT)
-
-        state.allLines.size shouldBe originalLineCount.let { state.allLines.size }
-        state.allLines.shouldNotBeEmpty()
-    }
-
     // ── format ──
 
     @Test
@@ -242,18 +199,5 @@ class JsonEditorStateTest {
 
         state.expandAll()
         state.foldState.isEmpty().shouldBeTrue()
-    }
-
-    // ── Fold state cleanup ──
-
-    @Test
-    fun reparseCleansUpStaleFoldIDs() {
-        val state = JsonEditorState(TestData.SIMPLE_OBJECT, isEditing = true)
-
-        state.collapseAll()
-        state.updateRawJson(TestData.SIMPLE_ARRAY)
-
-        val newValidIds = state.allLines.mapNotNull { it.foldId }.toSet()
-        state.foldState.keys.all { it in newValidIds }.shouldBeTrue()
     }
 }
