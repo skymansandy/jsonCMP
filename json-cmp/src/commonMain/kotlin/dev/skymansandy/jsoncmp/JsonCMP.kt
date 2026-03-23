@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import dev.skymansandy.jsoncmp.component.editor.EditorToolbar
-import dev.skymansandy.jsoncmp.component.editor.ErrorBanner
 import dev.skymansandy.jsoncmp.component.editor.JsonEditor
 import dev.skymansandy.jsoncmp.component.viewer.JsonViewer
 import dev.skymansandy.jsoncmp.config.JsonEditorState
@@ -36,16 +34,6 @@ fun JsonCMP(
         modifier = modifier,
     ) {
         if (state.isEditing) {
-            EditorToolbar(
-                state = state,
-                colors = theme.colors,
-            )
-
-            ErrorBanner(
-                error = state.error,
-                colors = theme.colors,
-            )
-
             JsonEditor(
                 modifier = Modifier.fillMaxSize(),
                 state = state,

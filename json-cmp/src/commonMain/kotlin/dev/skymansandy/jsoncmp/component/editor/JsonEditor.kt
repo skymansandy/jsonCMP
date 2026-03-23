@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
@@ -60,54 +61,66 @@ internal fun JsonEditor(
         )
     }
 
-    BoxWithConstraints(
-        modifier = modifier
-            .background(colors.background)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-            ) {
-                focusRequester.requestFocus()
-            },
-    ) {
-        val hasBoundedHeight = constraints.hasBoundedHeight
-        val gutterMinHeight = if (hasBoundedHeight) maxHeight else 200.dp
-        val scrollModifier = if (hasBoundedHeight) {
-            Modifier.verticalScroll(rememberScrollState())
-        } else {
-            Modifier
-        }
+    Column {
+        EditorToolbar(
+            state = state,
+            colors = colors,
+        )
 
-        Row(
-            modifier = Modifier
-                .defaultMinSize(minHeight = gutterMinHeight)
-                .then(scrollModifier),
-        ) {
-            // Line number gutter — positioned using actual text layout line offsets
-            LineGutterEditMode(
-                lineCount = lineCount,
-                textLayoutResult = textLayoutResult,
-                colors = colors,
-                gutterMinHeight = gutterMinHeight,
-            )
+        ErrorBanner(
+            error = state.error,
+            colors = colors,
+        )
 
-            // JSON editor
-            BasicTextField(
-                value = textFieldValue.copy(annotatedString = highlighted),
-                onValueChange = { newValue ->
-                    textFieldValue = newValue
-                    lastSyncedRaw = newValue.text
-                    state.updateRawJson(newValue.text)
+        BoxWithConstraints(
+            modifier = modifier
+                .background(colors.background)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    focusRequester.requestFocus()
                 },
-                onTextLayout = { textLayoutResult = it },
-                textStyle = monoStyle,
-                cursorBrush = SolidColor(colors.key),
+        ) {
+            val hasBoundedHeight = constraints.hasBoundedHeight
+            val gutterMinHeight = if (hasBoundedHeight) maxHeight else 200.dp
+            val scrollModifier = if (hasBoundedHeight) {
+                Modifier.verticalScroll(rememberScrollState())
+            } else {
+                Modifier
+            }
+
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .focusRequester(focusRequester)
-                    .horizontalScroll(horizontalScrollState)
-                    .padding(start = 8.dp, end = 16.dp),
-            )
+                    .defaultMinSize(minHeight = gutterMinHeight)
+                    .then(scrollModifier),
+            ) {
+                // Line number gutter — positioned using actual text layout line offsets
+                LineGutterEditMode(
+                    lineCount = lineCount,
+                    textLayoutResult = textLayoutResult,
+                    colors = colors,
+                    gutterMinHeight = gutterMinHeight,
+                )
+
+                // JSON editor
+                BasicTextField(
+                    value = textFieldValue.copy(annotatedString = highlighted),
+                    onValueChange = { newValue ->
+                        textFieldValue = newValue
+                        lastSyncedRaw = newValue.text
+                        state.updateRawJson(newValue.text)
+                    },
+                    onTextLayout = { textLayoutResult = it },
+                    textStyle = monoStyle,
+                    cursorBrush = SolidColor(colors.key),
+                    modifier = Modifier
+                        .weight(1f)
+                        .focusRequester(focusRequester)
+                        .horizontalScroll(horizontalScrollState)
+                        .padding(start = 8.dp, end = 16.dp),
+                )
+            }
         }
     }
 }
