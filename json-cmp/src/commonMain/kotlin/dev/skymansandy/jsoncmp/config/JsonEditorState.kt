@@ -97,8 +97,7 @@ fun rememberJsonEditorState(
     initialJson: String,
     isEditing: Boolean = false,
 ): JsonEditorState {
-
-    return remember {
+    return remember(initialJson) {
         JsonEditorState(
             initialJson = initialJson,
             isEditing = isEditing,
