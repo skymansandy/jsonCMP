@@ -37,19 +37,16 @@ internal fun ContentCell(
     colors: JsonCmpColors,
     onFoldToggle: () -> Unit,
     modifier: Modifier = Modifier,
+    foldedContentProvider: () -> String = { "" },
+    hasHiddenMatchProvider: () -> Boolean = { false },
 ) {
-    val lineText = buildString {
-        line.parts.forEach { append(it.text) }
-    }
-
-    if (isFolded && line.foldedContent.isNotEmpty()) {
+    if (isFolded && line.foldId != null) {
         // Folded: show "{ ... }" as visible text.
         // Tap → expand fold. Long-press → copy full JSON to clipboard.
         @Suppress("DEPRECATION")
         val clipboardManager = LocalClipboardManager.current
         val openingBracket = if (line.foldType == FoldType.Object) "{" else "["
         val closingBracket = if (line.foldType == FoldType.Object) "}" else "]"
-        val foldedJson = (openingBracket + " " + line.foldedContent).trimEnd(',', ' ')
 
         val prefixText = buildAnnotatedString {
             var cursor = 0
@@ -73,8 +70,7 @@ internal fun ContentCell(
             }
         }
 
-        val hasHiddenMatch = searchQuery.isNotBlank() &&
-            line.foldedContent.lowercase().contains(searchQuery.lowercase())
+        val hasHiddenMatch = hasHiddenMatchProvider()
 
         val ellipsisText = buildAnnotatedString {
             append("...")
@@ -93,9 +89,7 @@ internal fun ContentCell(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-                .background(colors.background)
-                .padding(start = 8.dp, end = 16.dp),
+            modifier = modifier.padding(start = 8.dp, end = 16.dp),
         ) {
             Text(
                 text = prefixText,
@@ -115,6 +109,7 @@ internal fun ContentCell(
                             detectTapGestures(
                                 onTap = { onFoldToggle() },
                                 onLongPress = {
+                                    val foldedJson = (openingBracket + " " + foldedContentProvider()).trimEnd(',', ' ')
                                     clipboardManager.setText(AnnotatedString(foldedJson))
                                 },
                             )
@@ -139,6 +134,10 @@ internal fun ContentCell(
             )
         }
     } else {
+        val lineText = buildString {
+            line.parts.forEach { append(it.text) }
+        }
+
         val styledText = buildAnnotatedString {
             append(lineText)
             var cursor = 0

@@ -2,6 +2,7 @@ package dev.skymansandy.jsoncmp.config
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +23,7 @@ import kotlinx.coroutines.withContext
 class JsonEditorState(initialJson: String, isEditing: Boolean) {
 
     var rawJson: String by mutableStateOf(initialJson)
-        private set
+        internal set
 
     var parsedJson: JsonNode? by mutableStateOf(null)
         private set
@@ -39,6 +40,11 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
 
     internal var allLines: List<JsonLine> by mutableStateOf(emptyList())
         private set
+
+    /** Visible lines computed via index-jump: O(visible) instead of O(all). */
+    internal val visibleLines: List<JsonLine> by derivedStateOf {
+        buildVisibleLines(allLines, foldState)
+    }
 
     fun collapseAll() {
         allLines.forEach { line ->
@@ -66,6 +72,32 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
         rawJson = sorted.toJsonString(compact = isCompact)
     }
 
+    /** Lazily computes the folded content text for a given foldable line. */
+    internal fun computeFoldedContent(line: JsonLine): String {
+        if (line.foldId == null || line.childEndIndex < 0) return ""
+        val lines = allLines
+        val startIdx = lines.indexOf(line)
+        if (startIdx < 0) return ""
+        val endIdx = line.childEndIndex.coerceAtMost(lines.size)
+        return lines.subList(startIdx + 1, endIdx)
+            .joinToString(" ") { l -> l.parts.joinToString("") { it.text }.trim() }
+    }
+
+    /** Checks whether any line inside a fold matches the search query. */
+    internal fun hasFoldedMatch(line: JsonLine, searchQuery: String): Boolean {
+        if (line.foldId == null || line.childEndIndex < 0 || searchQuery.isBlank()) return false
+        val lines = allLines
+        val startIdx = lines.indexOf(line)
+        if (startIdx < 0) return false
+        val endIdx = line.childEndIndex.coerceAtMost(lines.size)
+        val queryLower = searchQuery.lowercase()
+        for (i in (startIdx + 1) until endIdx) {
+            val lineText = lines[i].parts.joinToString("") { it.text }
+            if (lineText.lowercase().contains(queryLower)) return true
+        }
+        return false
+    }
+
     suspend fun parseJsonElement(json: String) = withContext(Dispatchers.Default) {
         val trimmed = json.trim()
         if (trimmed.isEmpty()) {
@@ -79,15 +111,40 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
         parsedJson = node
         error = err
         if (node != null) {
-            val normalized = node.toJsonString(compact = isCompact)
-            if (normalized != rawJson) {
-                rawJson = normalized
+            if (!isEditing) {
+                val normalized = node.toJsonString(compact = isCompact)
+                if (normalized != rawJson) {
+                    rawJson = normalized
+                }
             }
             allLines = buildDisplayLines(node)
             val validIds = allLines.mapNotNull { it.foldId }.toSet()
             foldState.keys.removeAll { it !in validIds }
         } else {
             allLines = emptyList()
+        }
+    }
+
+    companion object {
+        /** Builds visible lines using index-jump to skip folded sections in O(visible). */
+        private fun buildVisibleLines(
+            allLines: List<JsonLine>,
+            foldState: SnapshotStateMap<Int, Boolean>,
+        ): List<JsonLine> {
+            if (allLines.isEmpty()) return emptyList()
+            val result = ArrayList<JsonLine>(allLines.size / 2)
+            var i = 0
+            while (i < allLines.size) {
+                val line = allLines[i]
+                result.add(line)
+                // If this line is a folded header, jump past all its children
+                if (line.foldId != null && foldState[line.foldId] == true && line.childEndIndex > 0) {
+                    i = line.childEndIndex
+                } else {
+                    i++
+                }
+            }
+            return result
         }
     }
 }

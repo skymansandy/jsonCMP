@@ -13,6 +13,9 @@ internal class JsonLineBuilder {
     private var lineNum = 0
     private var nextFoldId = 0
 
+    /** Maps headerIdx (index in [out]) to the fold's closing-bracket index + 1. */
+    private val foldHeaders = mutableListOf<Int>()
+
     fun build(root: JsonNode): List<JsonLine> {
 
         addNode(
@@ -23,6 +26,20 @@ internal class JsonLineBuilder {
             parentFoldIds = emptyList(),
             path = emptyList(),
         )
+
+        // Post-pass: set childEndIndex for each foldable header line.
+        for (headerIdx in foldHeaders) {
+            val header = out[headerIdx]
+            val foldId = header.foldId ?: continue
+            // Find the closing bracket: it's the next line after all children
+            // whose parentFoldIds contains this foldId.
+            var endIdx = headerIdx + 1
+            while (endIdx < out.size && foldId in out[endIdx].parentFoldIds) {
+                endIdx++
+            }
+            out[headerIdx] = header.copy(childEndIndex = endIdx)
+        }
+
         return out
     }
 
@@ -57,6 +74,7 @@ internal class JsonLineBuilder {
                         myId, FoldType.Object, parentFoldIds,
                         foldChildCount = node.fields.size, path = path,
                     )
+                    foldHeaders += headerIdx
                     val childParents = parentFoldIds + myId
                     node.fields.forEachIndexed { i, (k, v) ->
                         addNode(
@@ -68,9 +86,6 @@ internal class JsonLineBuilder {
                         ++lineNum, depth, indent + listOf(JsonPart.Punct("}")) + comma,
                         null, null, childParents, isClosingBracket = true, path = path,
                     )
-                    val foldedContent = out.subList(headerIdx + 1, out.size)
-                        .joinToString(" ") { line -> line.parts.joinToString("") { it.text }.trim() }
-                    out[headerIdx] = out[headerIdx].copy(foldedContent = foldedContent)
                 }
             }
 
@@ -88,6 +103,7 @@ internal class JsonLineBuilder {
                         myId, FoldType.Array, parentFoldIds,
                         foldChildCount = node.elements.size, path = path,
                     )
+                    foldHeaders += headerIdx
                     val childParents = parentFoldIds + myId
                     node.elements.forEachIndexed { i, v ->
                         addNode(
@@ -99,9 +115,6 @@ internal class JsonLineBuilder {
                         ++lineNum, depth, indent + listOf(JsonPart.Punct("]")) + comma,
                         null, null, childParents, isClosingBracket = true, path = path,
                     )
-                    val foldedContent = out.subList(headerIdx + 1, out.size)
-                        .joinToString(" ") { line -> line.parts.joinToString("") { it.text }.trim() }
-                    out[headerIdx] = out[headerIdx].copy(foldedContent = foldedContent)
                 }
             }
 

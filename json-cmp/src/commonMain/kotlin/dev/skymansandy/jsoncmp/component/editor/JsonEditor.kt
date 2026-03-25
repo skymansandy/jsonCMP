@@ -46,18 +46,18 @@ internal fun JsonEditor(
     colors: JsonCmpColors,
 ) {
     var textFieldValue by remember { mutableStateOf(TextFieldValue(state.rawJson)) }
-    var lastSyncedRaw by remember { mutableStateOf(state.rawJson) }
+    var lastStateRawJson by remember { mutableStateOf(state.rawJson) }
 
-    if (state.rawJson != lastSyncedRaw) {
+    if (state.rawJson != lastStateRawJson) {
         textFieldValue = TextFieldValue(state.rawJson)
-        lastSyncedRaw = state.rawJson
+        lastStateRawJson = state.rawJson
     }
 
     val horizontalScrollState = rememberScrollState()
     val lineCount = remember(textFieldValue.text) { textFieldValue.text.count { it == '\n' } + 1 }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
-    var rawJson: String by mutableStateOf(state.rawJson)
+    var rawJson: String by remember { mutableStateOf(state.rawJson) }
     LaunchedEffect(Unit) {
         snapshotFlow { rawJson }
             .debounce(450.milliseconds) // doherty threshold
@@ -75,7 +75,9 @@ internal fun JsonEditor(
         )
     }
 
-    Column {
+    Column(
+        modifier = modifier.background(colors.background),
+    ) {
         EditorToolbar(
             state = state,
             colors = colors,
@@ -87,14 +89,12 @@ internal fun JsonEditor(
         )
 
         BoxWithConstraints(
-            modifier = modifier
-                .background(colors.background)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ) {
-                    focusRequester.requestFocus()
-                },
+            modifier = Modifier.clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                focusRequester.requestFocus()
+            },
         ) {
             val hasBoundedHeight = constraints.hasBoundedHeight
             val gutterMinHeight = if (hasBoundedHeight) maxHeight else 200.dp
@@ -122,7 +122,8 @@ internal fun JsonEditor(
                     value = textFieldValue.copy(annotatedString = highlighted),
                     onValueChange = { newValue ->
                         textFieldValue = newValue
-                        lastSyncedRaw = newValue.text
+                        state.rawJson = newValue.text
+                        lastStateRawJson = newValue.text
                         rawJson = newValue.text
                     },
                     onTextLayout = { textLayoutResult = it },
