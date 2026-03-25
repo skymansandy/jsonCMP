@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.foldGlyphSize
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
@@ -47,23 +48,26 @@ internal fun GutterCell(
                 end = 6.dp,
             ),
         )
+
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(foldGlyphSize)
                 .then(
-                    if (foldId != null) {
-                        Modifier.pointerInput(foldId) { detectTapGestures { onFoldToggle() } }
-                    } else {
-                        Modifier
+                    when {
+                        foldId == null -> Modifier
+                        else -> Modifier.pointerInput(foldId) {
+                            detectTapGestures { onFoldToggle() }
+                        }
                     },
                 ),
-            contentAlignment = Alignment.Center,
         ) {
             if (foldId != null) {
                 Text(
                     text = foldGlyph,
                     style = monoStyle,
                     color = colors.foldHint,
+                    lineHeight = foldGlyphSize.value.sp,
                 )
             }
         }
