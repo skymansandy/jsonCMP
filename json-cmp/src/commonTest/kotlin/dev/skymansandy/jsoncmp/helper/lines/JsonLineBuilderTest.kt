@@ -191,16 +191,16 @@ class JsonLineBuilderTest {
         lines[0].foldChildCount shouldBe 3 // 1, 2, 3
     }
 
-    // ── Folded content ──
+    // ── Child end index ──
 
     @Test
-    fun foldedContentContainsAllChildLineText() {
+    fun childEndIndexPointsPastAllChildren() {
         val lines = buildDisplayLines(TestData.simpleObjectNode)
-        val foldedContent = lines[0].foldedContent
-
-        foldedContent.shouldNotBeNull()
-        foldedContent.contains("\"name\"").shouldBeTrue()
-        foldedContent.contains("\"age\"").shouldBeTrue()
+        // lines: { , "name": "John", , "age": 30 , }
+        // Index:  0       1               2        3
+        val header = lines[0]
+        header.foldId.shouldNotBeNull()
+        header.childEndIndex shouldBe 4 // past closing }
     }
 
     // ── Closing brackets ──

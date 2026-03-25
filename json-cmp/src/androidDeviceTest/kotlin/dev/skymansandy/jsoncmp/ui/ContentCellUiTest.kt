@@ -50,7 +50,6 @@ class ContentCellUiTest {
         foldType = FoldType.Object,
         parentFoldIds = emptyList(),
         foldChildCount = 3,
-        foldedContent = "\"street\": \"123 Main St\", \"city\": \"NYC\" }",
     )
 
     private val arrayFoldableLine = JsonLine(
@@ -66,7 +65,6 @@ class ContentCellUiTest {
         foldType = FoldType.Array,
         parentFoldIds = emptyList(),
         foldChildCount = 2,
-        foldedContent = "\"a\", \"b\" ]",
     )
 
     @Test

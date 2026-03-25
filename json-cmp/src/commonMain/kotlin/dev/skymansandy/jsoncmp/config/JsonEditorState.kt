@@ -41,6 +41,18 @@ class JsonEditorState(initialJson: String, isEditing: Boolean) {
     internal var allLines: List<JsonLine> by mutableStateOf(emptyList())
         private set
 
+    init {
+        val trimmed = initialJson.trim()
+        if (trimmed.isNotEmpty()) {
+            val (node, err) = parseJsonResult(trimmed)
+            parsedJson = node
+            error = err
+            if (node != null) {
+                allLines = buildDisplayLines(node)
+            }
+        }
+    }
+
     /** Visible lines computed via index-jump: O(visible) instead of O(all). */
     internal val visibleLines: List<JsonLine> by derivedStateOf {
         buildVisibleLines(allLines, foldState)

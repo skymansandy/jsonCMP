@@ -26,6 +26,7 @@ internal fun GutterCell(
     foldId: Int? = null,
     isFolded: Boolean = false,
     onFoldToggle: () -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     val foldGlyph = when {
         foldId == null -> ""
@@ -34,7 +35,7 @@ internal fun GutterCell(
     }
 
     Row(
-        modifier = Modifier,
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -46,13 +47,19 @@ internal fun GutterCell(
                 end = 6.dp,
             ),
         )
-        if (foldId != null) {
-            Box(
-                modifier = Modifier
-                    .size(foldGlyphSize)
-                    .pointerInput(foldId) { detectTapGestures { onFoldToggle() } },
-                contentAlignment = Alignment.Center,
-            ) {
+        Box(
+            modifier = Modifier
+                .size(foldGlyphSize)
+                .then(
+                    if (foldId != null) {
+                        Modifier.pointerInput(foldId) { detectTapGestures { onFoldToggle() } }
+                    } else {
+                        Modifier
+                    },
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (foldId != null) {
                 Text(
                     text = foldGlyph,
                     style = monoStyle,

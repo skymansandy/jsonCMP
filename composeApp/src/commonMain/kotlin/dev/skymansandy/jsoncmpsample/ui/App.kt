@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,9 @@ import dev.skymansandy.jsoncmp.JsonCMP
 import dev.skymansandy.jsoncmp.config.JsonEditorState
 import dev.skymansandy.jsoncmp.config.JsonTheme
 import dev.skymansandy.jsoncmpsample.data.sampleJson
+import jsoncmp.composeapp.generated.resources.Res
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
@@ -61,12 +65,12 @@ fun App() {
             }
 
             var largeJson by remember { mutableStateOf(sampleJson) }
-//            LaunchedEffect(Unit) {
-//                withContext(Dispatchers.Default) {
-//                    val bytes = Res.readBytes("files/128KB.json")
-//                    largeJson = bytes.decodeToString()
-//                }
-//            }
+            LaunchedEffect(Unit) {
+                withContext(Dispatchers.Default) {
+                    val bytes = Res.readBytes("files/5mbjson.json")
+                    largeJson = bytes.decodeToString()
+                }
+            }
 
             val state by remember(largeJson) {
                 mutableStateOf(
@@ -129,7 +133,7 @@ fun App() {
                 JsonCMP(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
+                        .weight(1f),
                     state = state,
                     searchQuery = searchQuery,
                     theme = selectedTheme,

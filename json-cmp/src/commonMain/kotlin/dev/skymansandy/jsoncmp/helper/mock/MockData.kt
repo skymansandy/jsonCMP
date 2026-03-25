@@ -68,5 +68,4 @@ internal val previewFoldableLine = JsonLine(
     foldType = FoldType.Object,
     parentFoldIds = emptyList(),
     foldChildCount = 3,
-    foldedContent = "\"street\": \"123 Main St\", \"city\": \"New York\" }",
 )
