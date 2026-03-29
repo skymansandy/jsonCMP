@@ -2,6 +2,11 @@
 
 `JsonViewerCMP` renders JSON as a read-only, syntax-highlighted tree with line numbers, code folding, and virtualized rendering.
 
+<figure markdown="span">
+  ![JSON Viewer](../screenshots/viewer/viewer-hero.png){ width="350" }
+  <figcaption>Viewer with syntax highlighting, line numbers, and code folding</figcaption>
+</figure>
+
 ## Size Limits
 
 - **Valid JSON** — Virtually no size limit. The viewer uses virtualized rendering to handle large documents efficiently.
@@ -22,6 +27,11 @@ Each JSON token type is rendered in a distinct color:
 
 Objects and arrays can be collapsed by clicking the fold indicator in the gutter. Collapsed sections show an ellipsis with the element count.
 
+<figure markdown="span">
+  ![Code Folding](../screenshots/viewer/viewer-hero.png){ width="350" }
+  <figcaption>Collapsed "zip" object showing ellipsis with element count</figcaption>
+</figure>
+
 ## Line Numbers
 
 Line numbers are displayed in a gutter column with a subtle border separator.
@@ -39,6 +49,11 @@ JsonViewerCMP(
 ```
 
 Matches are highlighted with the `highlight` and `highlightFg` colors from the active theme.
+
+<figure markdown="span">
+  ![Search Highlighting](../screenshots/viewer/viewer-search.png){ width="350" }
+  <figcaption>Search results highlighted with match counter and navigation</figcaption>
+</figure>
 
 ## Nested Scrolling
 

@@ -2,6 +2,11 @@
 
 `JsonEditorCMP` provides inline text editing with real-time validation, formatting, and sorting.
 
+<figure markdown="span">
+  ![JSON Editor](../screenshots/editor/editor-hero.png){ width="350" }
+  <figcaption>Editor with toolbar controls for formatting, sorting, and folding</figcaption>
+</figure>
+
 ## Size Limit
 
 The editor enforces a **50 KB write limit**. Content exceeding 50 KB is truncated — both for `initialJson` passed to `rememberJsonEditorState` and for user input during editing.
@@ -37,6 +42,11 @@ When the JSON is invalid, an error banner appears below the toolbar showing:
 
 - Error message
 - Line and column position of the error
+
+<figure markdown="span">
+  ![Error Banner](../screenshots/editor/editor-error.png){ width="350" }
+  <figcaption>Error banner showing parse error with position details</figcaption>
+</figure>
 
 ## Real-time Validation
 

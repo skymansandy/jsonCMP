@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 skymansandy. All rights reserved.
+ */
+
 package dev.skymansandy.jsoncmp.ui.editor
 
 import androidx.compose.runtime.Composable

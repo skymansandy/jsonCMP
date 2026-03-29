@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 skymansandy. All rights reserved.
+ */
+
 package dev.skymansandy.jsoncmp.domain.model
 
 /** Whether a foldable line opens a JSON object or array. */

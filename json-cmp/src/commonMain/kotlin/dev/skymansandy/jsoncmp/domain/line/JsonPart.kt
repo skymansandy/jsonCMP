@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 skymansandy. All rights reserved.
+ */
+
 package dev.skymansandy.jsoncmp.domain.line
 
 /** A typed segment of text within a [JsonLine], used for syntax colouring. */

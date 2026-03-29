@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 skymansandy. All rights reserved.
+ */
+
 package dev.skymansandy.jsoncmp.domain.store
 
 /** User-driven actions dispatched to [JsonHolder]. */
