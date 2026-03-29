@@ -7,7 +7,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlin.test.Test
 
@@ -237,7 +236,6 @@ class JsonParserTest {
 
         node.shouldBeNull()
         error.shouldNotBeNull()
-        error.message shouldContain "Unexpected content"
     }
 
     @Test

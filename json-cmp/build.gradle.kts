@@ -46,6 +46,7 @@ kotlin {
                 implementation(libs.compose.ui)
                 implementation(libs.material.icons.extended)
                 implementation(libs.compose.uiToolingPreview)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
 

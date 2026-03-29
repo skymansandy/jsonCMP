@@ -5,7 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import dev.skymansandy.jsoncmp.config.rememberJsonEditorState
+import dev.skymansandy.jsoncmp.config.rememberJsonStore
 
 private val sampleJson = """
 {
@@ -29,7 +29,7 @@ private fun Preview_JsonCMP() {
     MaterialTheme {
         JsonCMP(
             modifier = Modifier.fillMaxSize(),
-            state = rememberJsonEditorState(initialJson = sampleJson),
+            store = rememberJsonStore(initialJson = sampleJson),
         )
     }
 }
@@ -40,7 +40,7 @@ private fun Preview_JsonCMPEditor() {
     MaterialTheme {
         JsonCMP(
             modifier = Modifier.fillMaxSize(),
-            state = rememberJsonEditorState(
+            store = rememberJsonStore(
                 initialJson = sampleJson,
                 isEditing = true,
             ),
@@ -55,7 +55,7 @@ private fun Preview_JsonCMPWithSearch() {
     MaterialTheme {
         JsonCMP(
             modifier = Modifier.fillMaxSize(),
-            state = rememberJsonEditorState(initialJson = sampleJson),
+            store = rememberJsonStore(initialJson = sampleJson),
             searchQuery = "John",
         )
     }
@@ -68,7 +68,7 @@ private fun Preview_JsonCMPEmpty() {
     MaterialTheme {
         JsonCMP(
             modifier = Modifier.fillMaxSize(),
-            state = rememberJsonEditorState(initialJson = ""),
+            store = rememberJsonStore(initialJson = ""),
         )
     }
 }
@@ -80,7 +80,7 @@ private fun Preview_JsonCMPInvalidJson() {
     MaterialTheme {
         JsonCMP(
             modifier = Modifier.fillMaxSize(),
-            state = rememberJsonEditorState(
+            store = rememberJsonStore(
                 initialJson = """{"name": "John", "age":}""",
                 isEditing = true,
             ),

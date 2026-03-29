@@ -1,6 +1,7 @@
 package dev.skymansandy.jsoncmp.ui
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -8,9 +9,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.skymansandy.jsoncmp.JsonCMP
-import dev.skymansandy.jsoncmp.config.JsonEditorState
+import dev.skymansandy.jsoncmp.config.JsonStore
 import dev.skymansandy.jsoncmp.config.JsonTheme
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,11 +29,11 @@ class JsonCMPUiTest {
 
     @Test
     fun viewerModeDisplaysParsedJsonContent() {
-        val state = JsonEditorState("""{"name": "John", "age": 30}""", isEditing = false)
+        val store = JsonStore("""{"name": "John", "age": 30}""", isEditing = false, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -41,11 +43,11 @@ class JsonCMPUiTest {
 
     @Test
     fun viewerModeDisplaysLineNumbers() {
-        val state = JsonEditorState("""{"name": "John", "age": 30}""", isEditing = false)
+        val store = JsonStore("""{"name": "John", "age": 30}""", isEditing = false, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -54,11 +56,11 @@ class JsonCMPUiTest {
 
     @Test
     fun viewerModeDoesNotShowEditorToolbar() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = false)
+        val store = JsonStore("""{"name": "John"}""", isEditing = false, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -67,11 +69,11 @@ class JsonCMPUiTest {
 
     @Test
     fun viewerModeShowsPlainTextForUnparseableContent() {
-        val state = JsonEditorState("just plain text", isEditing = false)
+        val store = JsonStore("just plain text", isEditing = false, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -82,11 +84,11 @@ class JsonCMPUiTest {
 
     @Test
     fun editorModeShowsToolbar() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = true)
+        val store = JsonStore("""{"name": "John"}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -95,11 +97,11 @@ class JsonCMPUiTest {
 
     @Test
     fun editorModeShowsFormatToggle() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = true)
+        val store = JsonStore("""{"name": "John"}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -108,11 +110,11 @@ class JsonCMPUiTest {
 
     @Test
     fun editorModeShowsErrorBannerForInvalidJson() {
-        val state = JsonEditorState("{invalid}", isEditing = true)
+        val store = JsonStore("{invalid}", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -121,11 +123,11 @@ class JsonCMPUiTest {
 
     @Test
     fun editorModeNoErrorBannerForValidJson() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = true)
+        val store = JsonStore("""{"name": "John"}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
@@ -137,13 +139,13 @@ class JsonCMPUiTest {
     @Test
     fun onJsonChangeReceivesInitialState() {
         val json = """{"name": "John"}"""
-        val state = JsonEditorState(json, isEditing = false)
+        val store = JsonStore(json, isEditing = false, dispatcher = Dispatchers.Unconfined)
         var receivedJson: String? = null
 
         composeTestRule.setContent {
             MaterialTheme {
                 JsonCMP(
-                    state = state,
+                    store = store,
                     theme = theme,
                     onJsonChange = { j, _, _ -> receivedJson = j },
                 )
@@ -158,18 +160,18 @@ class JsonCMPUiTest {
 
     @Test
     fun clickingFormatButtonTogglesCompactMode() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = true)
+        val store = JsonStore("""{"name": "John"}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
-                JsonCMP(state = state, theme = theme)
+                JsonCMP(store = store, theme = theme)
             }
         }
 
         composeTestRule.onNodeWithContentDescription("Compact").performClick()
         composeTestRule.waitForIdle()
 
-        state.isCompact shouldBe true
+        store.state.value.isCompact shouldBe true
         composeTestRule.onNodeWithContentDescription("Beautify").assertIsDisplayed()
     }
 
@@ -177,12 +179,12 @@ class JsonCMPUiTest {
 
     @Test
     fun viewerModeWithSearchQueryShowsMatchingContent() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = false)
+        val store = JsonStore("""{"name": "John"}""", isEditing = false, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
             MaterialTheme {
                 JsonCMP(
-                    state = state,
+                    store = store,
                     searchQuery = "John",
                     theme = theme,
                 )

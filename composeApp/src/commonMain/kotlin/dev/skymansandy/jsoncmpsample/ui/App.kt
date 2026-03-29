@@ -20,6 +20,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,13 +29,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.JsonCMP
-import dev.skymansandy.jsoncmp.config.JsonEditorState
+import dev.skymansandy.jsoncmp.config.JsonAction
 import dev.skymansandy.jsoncmp.config.JsonTheme
-import dev.skymansandy.jsoncmpsample.data.sampleJson
+import dev.skymansandy.jsoncmp.config.rememberJsonStore
 import jsoncmp.composeapp.generated.resources.Res
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
@@ -63,22 +66,25 @@ fun App() {
                 )
             }
 
-            var largeJson by remember { mutableStateOf(sampleJson) }
+            var largeJson by remember { mutableStateOf("") }
             LaunchedEffect(Unit) {
                 withContext(Dispatchers.Default) {
-                    val bytes = Res.readBytes("files/5mbjson.json")
-                    largeJson = bytes.decodeToString()
+                    do {
+                        val bytes2 = Res.readBytes("files/128kb.json")
+                        largeJson = bytes2.decodeToString()
+                        delay(3.seconds)
+                        val bytes = Res.readBytes("files/5mb.json")
+                        largeJson = bytes.decodeToString()
+                        delay(3.seconds)
+                    } while (false)
                 }
             }
 
-            val state by remember(largeJson) {
-                mutableStateOf(
-                    JsonEditorState(
-                        initialJson = largeJson,
-                        isEditing = false,
-                    ),
-                )
-            }
+            val store = rememberJsonStore(
+                initialJson = largeJson,
+                isEditing = false,
+            )
+            val state by store.state.collectAsState()
 
             Column(
                 modifier = Modifier
@@ -120,7 +126,7 @@ fun App() {
                     ) {
                         Switch(
                             checked = state.isEditing,
-                            onCheckedChange = { state.isEditing = it },
+                            onCheckedChange = { store.dispatch(JsonAction.SetEditing(it)) },
                         )
                         Text(
                             text = if (state.isEditing) "Edit" else "View",
@@ -130,10 +136,8 @@ fun App() {
                 }
 
                 JsonCMP(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    state = state,
+                    modifier = Modifier.fillMaxWidth(),
+                    store = store,
                     searchQuery = searchQuery,
                     theme = selectedTheme,
                 )

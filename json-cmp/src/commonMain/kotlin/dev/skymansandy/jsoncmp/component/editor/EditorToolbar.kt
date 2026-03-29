@@ -26,6 +26,7 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.skymansandy.jsoncmp.config.JsonEditorState
+import dev.skymansandy.jsoncmp.config.JsonAction
+import dev.skymansandy.jsoncmp.config.JsonStore
+import dev.skymansandy.jsoncmp.config.JsonStoreState
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
 import kotlinx.coroutines.launch
@@ -44,7 +47,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditorToolbar(
-    state: JsonEditorState,
+    state: JsonStoreState,
+    onAction: (JsonAction) -> Unit,
     colors: JsonCmpColors,
 ) {
     var showSortSheet by remember { mutableStateOf(false) }
@@ -65,7 +69,7 @@ internal fun EditorToolbar(
             state = rememberTooltipState(),
         ) {
             IconButton(
-                onClick = { state.format(compact = !state.isCompact) },
+                onClick = { onAction(JsonAction.Format(compact = !state.isCompact)) },
                 modifier = Modifier.size(36.dp),
             ) {
                 Icon(
@@ -125,7 +129,7 @@ internal fun EditorToolbar(
                     label = "Sort Ascending (A \u2192 Z)",
                     colors = colors,
                     onClick = {
-                        state.sortKeys(ascending = true)
+                        onAction(JsonAction.SortKeys(ascending = true))
                         scope.launch {
                             sheetState.hide()
                         }.invokeOnCompletion {
@@ -140,7 +144,7 @@ internal fun EditorToolbar(
                     label = "Sort Descending (Z \u2192 A)",
                     colors = colors,
                     onClick = {
-                        state.sortKeys(ascending = false)
+                        onAction(JsonAction.SortKeys(ascending = false))
                         scope.launch {
                             sheetState.hide()
                         }.invokeOnCompletion {
@@ -160,12 +164,12 @@ internal fun EditorToolbar(
 @Preview
 @Composable
 private fun Preview_EditorToolbar() {
+    val store = remember { JsonStore(initialJson = """{"name": "John"}""", isEditing = true) }
+    val state by store.state.collectAsState()
     MaterialTheme {
         EditorToolbar(
-            state = JsonEditorState(
-                initialJson = """{"name": "John"}""",
-                isEditing = true,
-            ),
+            state = state,
+            onAction = store::dispatch,
             colors = JsonCmpColors.Dark,
         )
     }

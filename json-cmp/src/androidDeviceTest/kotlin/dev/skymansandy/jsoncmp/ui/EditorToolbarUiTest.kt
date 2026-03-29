@@ -1,6 +1,8 @@
 package dev.skymansandy.jsoncmp.ui
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -8,10 +10,12 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.skymansandy.jsoncmp.component.editor.EditorToolbar
-import dev.skymansandy.jsoncmp.config.JsonEditorState
+import dev.skymansandy.jsoncmp.config.JsonAction
+import dev.skymansandy.jsoncmp.config.JsonStore
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.model.JsonNode
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,11 +30,12 @@ class EditorToolbarUiTest {
 
     @Test
     fun showsFormatButtonWithCompactDescriptionWhenNotCompact() {
-        val state = JsonEditorState("""{"a": 1}""", isEditing = true)
+        val store = JsonStore("""{"a": 1}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
@@ -39,12 +44,13 @@ class EditorToolbarUiTest {
 
     @Test
     fun showsFormatButtonWithBeautifyDescriptionWhenCompact() {
-        val state = JsonEditorState("""{"a": 1}""", isEditing = true)
-        state.format(compact = true)
+        val store = JsonStore("""{"a": 1}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
+        store.dispatch(JsonAction.Format(compact = true))
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
@@ -53,11 +59,12 @@ class EditorToolbarUiTest {
 
     @Test
     fun showsSortButton() {
-        val state = JsonEditorState("""{"a": 1}""", isEditing = true)
+        val store = JsonStore("""{"a": 1}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
@@ -66,48 +73,51 @@ class EditorToolbarUiTest {
 
     @Test
     fun clickingFormatTogglesCompactMode() {
-        val state = JsonEditorState("""{"a": 1}""", isEditing = true)
+        val store = JsonStore("""{"a": 1}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
-        state.isCompact shouldBe false
+        store.state.value.isCompact shouldBe false
         composeTestRule.onNodeWithContentDescription("Compact").performClick()
         composeTestRule.waitForIdle()
 
-        state.isCompact shouldBe true
+        store.state.value.isCompact shouldBe true
         composeTestRule.onNodeWithContentDescription("Beautify").assertIsDisplayed()
     }
 
     @Test
     fun clickingFormatTwiceRoundtrips() {
-        val state = JsonEditorState("""{"a": 1}""", isEditing = true)
+        val store = JsonStore("""{"a": 1}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
         composeTestRule.onNodeWithContentDescription("Compact").performClick()
         composeTestRule.waitForIdle()
-        state.isCompact shouldBe true
+        store.state.value.isCompact shouldBe true
 
         composeTestRule.onNodeWithContentDescription("Beautify").performClick()
         composeTestRule.waitForIdle()
-        state.isCompact shouldBe false
+        store.state.value.isCompact shouldBe false
     }
 
     @Test
     fun clickingSortOpensBottomSheet() {
-        val state = JsonEditorState("""{"a": 1}""", isEditing = true)
+        val store = JsonStore("""{"a": 1}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
@@ -121,11 +131,12 @@ class EditorToolbarUiTest {
 
     @Test
     fun sortAscendingReordersKeys() {
-        val state = JsonEditorState("""{"c": 3, "a": 1, "b": 2}""", isEditing = true)
+        val store = JsonStore("""{"c": 3, "a": 1, "b": 2}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
@@ -134,17 +145,18 @@ class EditorToolbarUiTest {
         composeTestRule.onNodeWithText("Sort Ascending (A \u2192 Z)").performClick()
         composeTestRule.waitForIdle()
 
-        val obj = state.parsedJson as JsonNode.JObject
+        val obj = store.state.value.parsedJson as JsonNode.JObject
         obj.fields.map { it.first } shouldBe listOf("a", "b", "c")
     }
 
     @Test
     fun sortDescendingReordersKeys() {
-        val state = JsonEditorState("""{"a": 1, "b": 2, "c": 3}""", isEditing = true)
+        val store = JsonStore("""{"a": 1, "b": 2, "c": 3}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                EditorToolbar(state = state, colors = colors)
+                EditorToolbar(state = state, onAction = store::dispatch, colors = colors)
             }
         }
 
@@ -153,7 +165,7 @@ class EditorToolbarUiTest {
         composeTestRule.onNodeWithText("Sort Descending (Z \u2192 A)").performClick()
         composeTestRule.waitForIdle()
 
-        val obj = state.parsedJson as JsonNode.JObject
+        val obj = store.state.value.parsedJson as JsonNode.JObject
         obj.fields.map { it.first } shouldBe listOf("c", "b", "a")
     }
 }

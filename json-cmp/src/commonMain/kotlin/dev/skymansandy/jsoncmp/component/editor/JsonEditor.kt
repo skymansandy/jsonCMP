@@ -14,12 +14,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -30,41 +29,31 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.component.common.highlightJson
-import dev.skymansandy.jsoncmp.config.JsonEditorState
+import dev.skymansandy.jsoncmp.config.JsonAction
+import dev.skymansandy.jsoncmp.config.JsonStore
+import dev.skymansandy.jsoncmp.config.JsonStoreState
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
 import dev.skymansandy.jsoncmp.helper.constants.typography.monoStyle
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
-import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(FlowPreview::class)
 @Composable
 internal fun JsonEditor(
     modifier: Modifier = Modifier,
-    state: JsonEditorState,
+    state: JsonStoreState,
+    onAction: (JsonAction) -> Unit,
     searchQuery: String,
     colors: JsonCmpColors,
 ) {
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(state.rawJson)) }
-    var lastStateRawJson by remember { mutableStateOf(state.rawJson) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(state.raw)) }
+    var lastStateRaw by remember { mutableStateOf(state.raw) }
 
-    if (state.rawJson != lastStateRawJson) {
-        textFieldValue = TextFieldValue(state.rawJson)
-        lastStateRawJson = state.rawJson
+    if (state.raw != lastStateRaw) {
+        textFieldValue = TextFieldValue(state.raw)
+        lastStateRaw = state.raw
     }
 
     val horizontalScrollState = rememberScrollState()
     val lineCount = remember(textFieldValue.text) { textFieldValue.text.count { it == '\n' } + 1 }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-
-    var rawJson: String by remember { mutableStateOf(state.rawJson) }
-    LaunchedEffect(Unit) {
-        snapshotFlow { rawJson }
-            .debounce(450.milliseconds) // doherty threshold
-            .collect {
-                state.parseJsonElement(it)
-            }
-    }
 
     val focusRequester = remember { FocusRequester() }
     val highlighted: AnnotatedString = remember(textFieldValue.text, searchQuery, colors) {
@@ -80,6 +69,7 @@ internal fun JsonEditor(
     ) {
         EditorToolbar(
             state = state,
+            onAction = onAction,
             colors = colors,
         )
 
@@ -122,9 +112,8 @@ internal fun JsonEditor(
                     value = textFieldValue.copy(annotatedString = highlighted),
                     onValueChange = { newValue ->
                         textFieldValue = newValue
-                        state.rawJson = newValue.text
-                        lastStateRawJson = newValue.text
-                        rawJson = newValue.text
+                        lastStateRaw = newValue.text
+                        onAction(JsonAction.SetRaw(newValue.text))
                     },
                     onTextLayout = { textLayoutResult = it },
                     textStyle = monoStyle,
@@ -155,12 +144,12 @@ private val previewColors = JsonCmpColors.Dark
 @Preview
 @Composable
 private fun Preview_JsonEditor() {
+    val store = remember { JsonStore(initialJson = previewJson, isEditing = true) }
+    val state by store.state.collectAsState()
     MaterialTheme {
         JsonEditor(
-            state = JsonEditorState(
-                initialJson = previewJson,
-                isEditing = true,
-            ),
+            state = state,
+            onAction = store::dispatch,
             searchQuery = "",
             colors = previewColors,
         )
@@ -170,12 +159,12 @@ private fun Preview_JsonEditor() {
 @Preview
 @Composable
 private fun Preview_JsonEditorWithSearch() {
+    val store = remember { JsonStore(initialJson = previewJson, isEditing = true) }
+    val state by store.state.collectAsState()
     MaterialTheme {
         JsonEditor(
-            state = JsonEditorState(
-                initialJson = previewJson,
-                isEditing = true,
-            ),
+            state = state,
+            onAction = store::dispatch,
             searchQuery = "age",
             colors = previewColors,
         )

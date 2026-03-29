@@ -1,13 +1,17 @@
 package dev.skymansandy.jsoncmp.ui
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.skymansandy.jsoncmp.component.editor.JsonEditor
-import dev.skymansandy.jsoncmp.config.JsonEditorState
+import dev.skymansandy.jsoncmp.config.JsonAction
+import dev.skymansandy.jsoncmp.config.JsonStore
 import dev.skymansandy.jsoncmp.helper.constants.colors.JsonCmpColors
+import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,11 +26,12 @@ class CodeEditorUiTest {
 
     @Test
     fun displaysJsonText() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = true)
+        val store = JsonStore("""{"name": "John"}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                JsonEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, onAction = store::dispatch, searchQuery = "", colors = colors)
             }
         }
 
@@ -37,11 +42,12 @@ class CodeEditorUiTest {
     @Test
     fun displaysLineNumbers() {
         val json = "{\n  \"name\": \"John\",\n  \"age\": 30\n}"
-        val state = JsonEditorState(json, isEditing = true)
+        val store = JsonStore(json, isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                JsonEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, onAction = store::dispatch, searchQuery = "", colors = colors)
             }
         }
 
@@ -50,15 +56,16 @@ class CodeEditorUiTest {
 
     @Test
     fun syncsStateWhenFormatChangesExternally() {
-        val state = JsonEditorState("""{"a": 1, "b": 2}""", isEditing = true)
+        val store = JsonStore("""{"a": 1, "b": 2}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                JsonEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, onAction = store::dispatch, searchQuery = "", colors = colors)
             }
         }
 
-        state.format(compact = false)
+        store.dispatch(JsonAction.Format(compact = false))
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("\"a\"", substring = true).assertIsDisplayed()
@@ -66,11 +73,12 @@ class CodeEditorUiTest {
 
     @Test
     fun displaysWithSearchQueryWithoutCrash() {
-        val state = JsonEditorState("""{"name": "John"}""", isEditing = true)
+        val store = JsonStore("""{"name": "John"}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                JsonEditor(state = state, searchQuery = "John", colors = colors)
+                JsonEditor(state = state, onAction = store::dispatch, searchQuery = "John", colors = colors)
             }
         }
 
@@ -79,11 +87,12 @@ class CodeEditorUiTest {
 
     @Test
     fun displaysCompactJsonContent() {
-        val state = JsonEditorState("""{"a":1}""", isEditing = true)
+        val store = JsonStore("""{"a":1}""", isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                JsonEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, onAction = store::dispatch, searchQuery = "", colors = colors)
             }
         }
 
@@ -106,11 +115,12 @@ class CodeEditorUiTest {
               "j": 10
             }
         """.trimIndent()
-        val state = JsonEditorState(json, isEditing = true)
+        val store = JsonStore(json, isEditing = true, dispatcher = Dispatchers.Unconfined)
 
         composeTestRule.setContent {
+            val state by store.state.collectAsState()
             MaterialTheme {
-                JsonEditor(state = state, searchQuery = "", colors = colors)
+                JsonEditor(state = state, onAction = store::dispatch, searchQuery = "", colors = colors)
             }
         }
 
