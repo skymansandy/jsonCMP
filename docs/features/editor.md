@@ -1,6 +1,10 @@
 # JSON Editor
 
-`JsonEditorCMP` provides inline text editing with real-time validation, formatting, and sorting. It has a 50 KB size limit for JSON content.
+`JsonEditorCMP` provides inline text editing with real-time validation, formatting, and sorting.
+
+## Size Limit
+
+The editor enforces a **50 KB write limit**. Content exceeding 50 KB is truncated — both for `initialJson` passed to `rememberJsonEditorState` and for user input during editing.
 
 ## Usage
 

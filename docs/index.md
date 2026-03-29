@@ -43,7 +43,7 @@ Full editing mode with real-time validation:
 - Inline text editing with live parse feedback
 - Error banner showing parse errors with line/column position
 - Toolbar with format, sort, collapse/expand controls
-- 50 KB size limit for JSON content
+- 50 KB write limit
 
 ```kotlin
 @OptIn(ExperimentalJsonCmpApi::class)

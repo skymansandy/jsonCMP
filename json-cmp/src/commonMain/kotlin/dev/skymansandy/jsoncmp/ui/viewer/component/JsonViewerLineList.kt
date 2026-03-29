@@ -78,7 +78,56 @@ internal fun JsonViewerLineList(
             )
         }
 
-        // Horizontal scroll wraps the entire LazyColumn so gutter + content scroll together
+        val lineContent: @Composable (JsonLine) -> Unit = { line ->
+            val isFolded = line.foldId != null && foldState[line.foldId] == true
+
+            Row(
+                modifier = Modifier
+                    .defaultMinSize(minWidth = viewportWidth)
+                    .height(IntrinsicSize.Min),
+            ) {
+                // Sticky gutter: offset counters horizontal scroll so it stays pinned to the left.
+                // zIndex(1f) ensures it renders above the scrollable content.
+                DisableSelection {
+                    GutterCell(
+                        lineNumber = line.lineNumber,
+                        numDigits = numDigits,
+                        foldId = line.foldId,
+                        isFolded = isFolded,
+                        onFoldToggle = {
+                            line.foldId?.let { id ->
+                                onAction(JsonAction.ToggleFold(id))
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .zIndex(1f)
+                            .offset { IntOffset(horizontalScrollState.value, 0) }
+                            .background(colors.gutterBackground)
+                            .onSizeChanged { size ->
+                                val newWidth: Dp
+                                with(density) { newWidth = size.width.toDp() }
+                                if (newWidth != gutterWidth) onGutterWidthChange(newWidth)
+                            },
+                    )
+                }
+
+                JsonLineView(
+                    line = line,
+                    isFolded = isFolded,
+                    searchQuery = searchQuery,
+                    onFoldToggle = {
+                        line.foldId?.let { id ->
+                            onAction(JsonAction.ToggleFold(id))
+                        }
+                    },
+                    foldedContentProvider = { state.computeFoldedContent(line) },
+                    hasHiddenMatchProvider = { state.hasFoldedMatch(line, searchQuery) },
+                    modifier = Modifier,
+                )
+            }
+        }
+
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -88,56 +137,7 @@ internal fun JsonViewerLineList(
             items(
                 items = visibleLines,
                 key = { it.lineNumber },
-            ) { line ->
-
-                val isFolded = line.foldId != null && foldState[line.foldId] == true
-
-                Row(
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = viewportWidth)
-                        .height(IntrinsicSize.Min),
-                ) {
-                    // Sticky gutter: offset counters horizontal scroll so it stays pinned to the left.
-                    // zIndex(1f) ensures it renders above the scrollable content.
-                    DisableSelection {
-                        GutterCell(
-                            lineNumber = line.lineNumber,
-                            numDigits = numDigits,
-                            foldId = line.foldId,
-                            isFolded = isFolded,
-                            onFoldToggle = {
-                                line.foldId?.let { id ->
-                                    onAction(JsonAction.ToggleFold(id))
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .zIndex(1f)
-                                .offset { IntOffset(horizontalScrollState.value, 0) }
-                                .background(colors.gutterBackground)
-                                .onSizeChanged { size ->
-                                    val newWidth: Dp
-                                    with(density) { newWidth = size.width.toDp() }
-                                    if (newWidth != gutterWidth) onGutterWidthChange(newWidth)
-                                },
-                        )
-                    }
-
-                    JsonLineView(
-                        line = line,
-                        isFolded = isFolded,
-                        searchQuery = searchQuery,
-                        onFoldToggle = {
-                            line.foldId?.let { id ->
-                                onAction(JsonAction.ToggleFold(id))
-                            }
-                        },
-                        foldedContentProvider = { state.computeFoldedContent(line) },
-                        hasHiddenMatchProvider = { state.hasFoldedMatch(line, searchQuery) },
-                        modifier = Modifier,
-                    )
-                }
-            }
+            ) { line -> lineContent(line) }
         }
     }
 }

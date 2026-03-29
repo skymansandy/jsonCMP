@@ -12,8 +12,8 @@ Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, 
 
 ## Features
 
-- **JSON Viewer** — Read-only, syntax-highlighted, foldable JSON tree with virtualized rendering
-- **JSON Editor** — Editable JSON with real-time validation, formatting, and sorting (50 KB limit)
+- **JSON Viewer** — Read-only, syntax-highlighted, foldable JSON tree with virtualized rendering (virtually no size limit for valid JSON; invalid JSON truncated at 100 KB)
+- **JSON Editor** — Editable JSON with real-time validation, formatting, and sorting (50 KB write limit)
 - **Search** — Highlight matching text across the JSON document
 - **Multiple Themes** — Dark, Light, Monokai, Dracula, Solarized Dark (+ custom themes)
 - **KMP** — Android, iOS, and JVM Desktop support via Compose Multiplatform

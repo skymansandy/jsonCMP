@@ -47,9 +47,14 @@ class JsonEditorState internal constructor(
 @ExperimentalJsonCmpApi
 @Composable
 fun rememberJsonEditorState(initialJson: String = ""): JsonEditorState {
+    val clampedJson = if (initialJson.length > EDITOR_MAX_SIZE) {
+        initialJson.take(EDITOR_MAX_SIZE)
+    } else {
+        initialJson
+    }
     val store = retain {
         JsonHolderImpl(
-            initialJson = initialJson,
+            initialJson = clampedJson,
             isEditing = true,
         )
     }

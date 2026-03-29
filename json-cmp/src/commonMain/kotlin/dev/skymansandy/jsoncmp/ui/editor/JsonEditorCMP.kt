@@ -53,4 +53,4 @@ fun JsonEditorCMP(
     }
 }
 
-private const val EDITOR_MAX_SIZE = 50 * 1024
+internal const val EDITOR_MAX_SIZE = 50 * 1024

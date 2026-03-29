@@ -30,6 +30,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,7 +84,6 @@ fun App() {
         val viewerState = rememberJsonViewerState(json = viewerJson)
 
         val editorJson = if (showInvalidJson) fiveMbJson else sampleJson
-        val editorState = rememberJsonEditorState(initialJson = editorJson)
 
         Scaffold(
             topBar = {
@@ -183,12 +183,16 @@ fun App() {
                         searchQuery = searchQuery,
                         theme = selectedTheme,
                     )
-                    1 -> JsonEditorCMP(
-                        state = editorState,
-                        modifier = Modifier.fillMaxWidth().weight(1f),
-                        searchQuery = searchQuery,
-                        theme = selectedTheme,
-                    )
+
+                    1 -> key(showInvalidJson) {
+                        val editorState = rememberJsonEditorState(initialJson = editorJson)
+                        JsonEditorCMP(
+                            state = editorState,
+                            modifier = Modifier.fillMaxWidth().weight(1f),
+                            searchQuery = searchQuery,
+                            theme = selectedTheme,
+                        )
+                    }
                 }
             }
         }
