@@ -4,7 +4,7 @@
   <img src="docs/icon.svg" width="128" height="128" alt="JsonCMP Icon"/>
 </p>
 
-[![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Coverage](https://img.shields.io/badge/coverage-0%25-red)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Maven Central](https://img.shields.io/badge/maven--central-1.0.0--RC1-blue)](https://central.sonatype.com/artifact/dev.skymansandy/json-cmp)
+[![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Coverage](https://img.shields.io/badge/coverage-0%25-red)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Maven Central](https://img.shields.io/badge/maven--central-1.0.0--RC2-blue)](https://central.sonatype.com/artifact/dev.skymansandy/json-cmp)
 
 Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, and JVM Desktop.
 
@@ -43,7 +43,7 @@ Then add the dependency:
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("dev.skymansandy:json-cmp:1.0.0-RC1")
+    implementation("dev.skymansandy:json-cmp:1.0.0-RC2")
 }
 ```
 
