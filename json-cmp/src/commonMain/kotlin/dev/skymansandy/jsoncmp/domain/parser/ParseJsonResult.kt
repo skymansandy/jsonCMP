@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 skymansandy. All rights reserved.
+ */
+
 package dev.skymansandy.jsoncmp.domain.parser
 
 import dev.skymansandy.jsoncmp.domain.line.buildDisplayLines

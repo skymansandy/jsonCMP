@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 skymansandy. All rights reserved.
+ */
+
 package dev.skymansandy.jsoncmp.theme
 
 /** Named theme wrapping a [JsonCmpColors] palette. Use [Custom] for user-defined colors. */
