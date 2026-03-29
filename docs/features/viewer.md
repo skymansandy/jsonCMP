@@ -1,6 +1,11 @@
 # JSON Viewer
 
-The viewer renders JSON as a read-only, syntax-highlighted tree with line numbers and code folding.
+`JsonViewerCMP` renders JSON as a read-only, syntax-highlighted tree with line numbers, code folding, and virtualized rendering.
+
+## Size Limits
+
+- **Valid JSON** — Virtually no size limit. The viewer uses virtualized rendering to handle large documents efficiently.
+- **Invalid JSON** — Truncated at 100 KB. A warning is shown indicating the original size and that the preview is truncated.
 
 ## Syntax Highlighting
 
@@ -17,12 +22,6 @@ Each JSON token type is rendered in a distinct color:
 
 Objects and arrays can be collapsed by clicking the fold indicator in the gutter. Collapsed sections show an ellipsis with the element count.
 
-```kotlin
-// Programmatic control
-state.collapseAll()
-state.expandAll()
-```
-
 ## Line Numbers
 
 Line numbers are displayed in a gutter column with a subtle border separator.
@@ -32,11 +31,42 @@ Line numbers are displayed in a gutter column with a subtle border separator.
 Pass a `searchQuery` to highlight matching text across the document:
 
 ```kotlin
-JsonCMP(
+JsonViewerCMP(
     state = state,
     searchQuery = "John",
-    colors = JsonCmpColors.Dark,
+    theme = JsonTheme.Dark,
 )
 ```
 
 Matches are highlighted with the `highlight` and `highlightFg` colors from the active theme.
+
+## Nested Scrolling
+
+`JsonViewerCMP` uses `LazyColumn` internally for virtualized rendering. If you place it inside a vertically scrollable parent (e.g. `Column` with `verticalScroll`, or another `LazyColumn`), you must give `JsonViewerCMP` a bounded height (e.g. `Modifier.height(400.dp)` or `Modifier.weight(1f)`) and handle nested scroll coordination on the client side using Compose's `nestedScroll` modifier.
+
+```kotlin
+// Example: viewer inside a scrollable Column
+Column(Modifier.verticalScroll(rememberScrollState())) {
+    Text("Header")
+
+    // Give the viewer a fixed height so LazyColumn can measure
+    JsonViewerCMP(
+        modifier = Modifier.fillMaxWidth().height(500.dp),
+        state = state,
+    )
+
+    Text("Footer")
+}
+```
+
+## Reactive State
+
+The viewer responds to changes in the `json` parameter passed to `rememberJsonViewerState` — new values trigger a re-parse and update the display:
+
+```kotlin
+var json by remember { mutableStateOf(initialJson) }
+val state = rememberJsonViewerState(json = json)
+
+// Updating `json` will automatically re-render the viewer
+json = newJson
+```

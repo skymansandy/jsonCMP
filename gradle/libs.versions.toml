@@ -23,8 +23,10 @@ detekt = "1.23.8"
 mokkery = "3.3.0"
 kover = "0.9.7"
 mavenPublish = "0.30.0"
+bcv = "0.17.0"
 kotest = "6.1.7"
 turbine = "1.2.1"
+kotlinx-serialization-json = "1.8.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -53,6 +55,7 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -67,3 +70,4 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
+bcv = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "bcv" }

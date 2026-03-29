@@ -8,12 +8,14 @@
 
 Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, and JVM Desktop.
 
+> **⚠️ Experimental:** This library is in an experimental state. APIs may change without notice between releases. Use in production at your own discretion.
+
 ## Features
 
-- **JSON Viewer** — Syntax-highlighted, foldable JSON tree with line numbers
-- **JSON Editor** — Editable JSON with real-time validation, formatting, and sorting
+- **JSON Viewer** — Read-only, syntax-highlighted, foldable JSON tree with virtualized rendering (virtually no size limit for valid JSON; invalid JSON truncated at 100 KB)
+- **JSON Editor** — Editable JSON with real-time validation, formatting, and sorting (50 KB write limit)
 - **Search** — Highlight matching text across the JSON document
-- **Multiple Themes** — Dark, Light, Monokai, Dracula, Solarized Dark
+- **Multiple Themes** — Dark, Light, Monokai, Dracula, Solarized Dark (+ custom themes)
 - **KMP** — Android, iOS, and JVM Desktop support via Compose Multiplatform
 
 ## Installation
@@ -41,76 +43,95 @@ dependencies {
 
 ## Quick Start
 
+### JSON Viewer
+
 ```kotlin
+@OptIn(ExperimentalJsonCmpApi::class)
 @Composable
-fun MyScreen() {
-    val state = rememberJsonEditorState(
-        initialJson = """{"name": "John", "age": 30}""",
+fun MyViewer() {
+    val state = rememberJsonViewerState(
+        json = """{"name": "John", "age": 30}""",
     )
 
-    JsonCMP(
+    JsonViewerCMP(
         modifier = Modifier.fillMaxSize(),
         state = state,
     )
 }
 ```
 
-## Editor Mode
+### JSON Editor
 
 ```kotlin
+@OptIn(ExperimentalJsonCmpApi::class)
 @Composable
 fun MyEditor() {
     val state = rememberJsonEditorState(
         initialJson = """{"name": "John", "age": 30}""",
-        isEditing = true,
     )
 
-    JsonCMP(
+    JsonEditorCMP(
         modifier = Modifier.fillMaxSize(),
         state = state,
-        onJsonChange = { json, parsed, error ->
-            // React to JSON changes
-        },
     )
+
+    // Observe state reactively — no callbacks needed
+    // state.json, state.parsedJson, state.error
 }
 ```
 
 ## Themes
 
 ```kotlin
-JsonCMP(
+JsonViewerCMP(
     state = state,
-    colors = JsonCmpColors.Monokai, // Dark, Light, Monokai, Dracula, SolarizedDark
+    theme = JsonTheme.Monokai, // Dark, Light, Monokai, Dracula, SolarizedDark
+)
+
+// Or use a custom theme
+JsonEditorCMP(
+    state = editorState,
+    theme = JsonTheme.Custom(myColors),
 )
 ```
 
 ## API
 
-### JsonCMP
+### JsonViewerCMP
 
 ```kotlin
 @Composable
-fun JsonCMP(
+fun JsonViewerCMP(
     modifier: Modifier = Modifier,
-    state: JsonEditorState,
+    state: JsonViewerState,
     searchQuery: String = "",
-    colors: JsonCmpColors = JsonCmpColors.Dark,
-    onJsonChange: (json: String, parsed: JsonNode?, error: JsonError?) -> Unit = { _, _, _ -> },
+    theme: JsonTheme = JsonTheme.Dark,
 )
 ```
 
-### JsonEditorState
+### JsonEditorCMP
 
 ```kotlin
-val state = rememberJsonEditorState(
-    initialJson = "...",
-    isEditing = false,
+@Composable
+fun JsonEditorCMP(
+    modifier: Modifier = Modifier,
+    state: JsonEditorState,
+    searchQuery: String = "",
+    theme: JsonTheme = JsonTheme.Dark,
 )
+```
 
-state.updateRawJson(newJson)     // Update JSON content
-state.format(compact = false)    // Pretty-print or minify
-state.sortKeys(ascending = true) // Sort object keys
-state.collapseAll()              // Collapse all foldable nodes
-state.expandAll()                // Expand all nodes
-state.isEditing = true           // Toggle editor mode
+### State
+
+```kotlin
+// Viewer — responds to changes in the json parameter
+val viewerState = rememberJsonViewerState(json = "...")
+
+// Editor — initialJson is used once to seed; editor owns its text state
+val editorState = rememberJsonEditorState(initialJson = "...")
+
+// Both expose observable properties:
+// state.json       — current raw JSON text
+// state.parsedJson — parsed JsonNode tree, or null if invalid
+// state.error      — parse error, or null if valid
 ```

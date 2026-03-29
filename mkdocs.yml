@@ -68,9 +68,9 @@ nav:
       - JSON Editor: features/editor.md
       - Themes: features/themes.md
   - API Reference:
-      - JsonCMP: api/jsoncmp.md
-      - JsonEditorState: api/state.md
-      - JsonCmpColors: api/colors.md
+      - JsonViewerCMP & JsonEditorCMP: api/jsoncmp.md
+      - State: api/state.md
+      - JsonTheme & JsonCmpColors: api/colors.md
 
 extra:
   social:
