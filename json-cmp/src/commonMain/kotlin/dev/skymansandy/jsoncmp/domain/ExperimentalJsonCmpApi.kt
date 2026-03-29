@@ -1,6 +1,4 @@
-package dev.skymansandy.jsoncmp
-
-import kotlin.RequiresOptIn.Level
+package dev.skymansandy.jsoncmp.domain
 
 /**
  * Marks an API as experimental within the JsonCMP library.
@@ -9,7 +7,7 @@ import kotlin.RequiresOptIn.Level
  * and does not provide any compatibility guarantees.
  */
 @RequiresOptIn(
-    level = Level.WARNING,
+    level = RequiresOptIn.Level.WARNING,
     message = "JsonCMP is in experimental state. Public API can change in future releases",
 )
 @Retention(AnnotationRetention.BINARY)

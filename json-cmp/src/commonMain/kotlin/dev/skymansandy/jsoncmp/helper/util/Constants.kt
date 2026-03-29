@@ -1,4 +1,4 @@
-package dev.skymansandy.jsoncmp.ui.util
+package dev.skymansandy.jsoncmp.helper.util
 
 import androidx.compose.ui.unit.dp
 

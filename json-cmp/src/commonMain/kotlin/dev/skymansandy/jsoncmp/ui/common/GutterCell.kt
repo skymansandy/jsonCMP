@@ -8,32 +8,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.skymansandy.jsoncmp.ui.preview.previewColors
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
-import dev.skymansandy.jsoncmp.ui.theme.monoStyle
-import dev.skymansandy.jsoncmp.ui.util.foldGlyphSize
+import dev.skymansandy.jsoncmp.helper.util.foldGlyphSize
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
+import dev.skymansandy.jsoncmp.theme.monoStyle
 
 /** Line number cell with an optional fold glyph (▶/▼). */
 @Composable
 internal fun GutterCell(
+    modifier: Modifier = Modifier,
     lineNumber: Int,
     numDigits: Int,
-    colors: JsonCmpColors,
     foldId: Int? = null,
     isFolded: Boolean = false,
     onFoldToggle: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
-    val foldGlyph = when {
-        foldId == null -> ""
-        isFolded -> "▶"
-        else -> "▼"
+    val colors = LocalJsonCmpColors.current
+    val foldGlyph = remember(foldId, isFolded) {
+        when {
+            foldId == null -> ""
+            isFolded -> "▶"
+            else -> "▼"
+        }
     }
 
     Row(
@@ -84,7 +86,6 @@ private fun Preview_GutterCell() {
         GutterCell(
             lineNumber = 2,
             numDigits = 2,
-            colors = previewColors,
         )
     }
 }
@@ -96,7 +97,6 @@ private fun Preview_GutterCellFoldable() {
         GutterCell(
             lineNumber = 5,
             numDigits = 2,
-            colors = previewColors,
             foldId = 1,
             isFolded = false,
             onFoldToggle = {},
@@ -111,7 +111,6 @@ private fun Preview_GutterCellFolded() {
         GutterCell(
             lineNumber = 5,
             numDigits = 2,
-            colors = previewColors,
             foldId = 1,
             isFolded = true,
             onFoldToggle = {},

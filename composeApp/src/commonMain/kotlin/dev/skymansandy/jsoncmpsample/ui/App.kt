@@ -36,10 +36,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.ExperimentalJsonCmpApi
+import dev.skymansandy.jsoncmp.domain.ExperimentalJsonCmpApi
+import dev.skymansandy.jsoncmp.theme.JsonTheme
 import dev.skymansandy.jsoncmp.ui.editor.JsonEditorCMP
 import dev.skymansandy.jsoncmp.ui.editor.rememberJsonEditorState
-import dev.skymansandy.jsoncmp.ui.theme.JsonTheme
 import dev.skymansandy.jsoncmp.ui.viewer.JsonViewerCMP
 import dev.skymansandy.jsoncmp.ui.viewer.rememberJsonViewerState
 import dev.skymansandy.jsoncmpsample.data.sampleJson

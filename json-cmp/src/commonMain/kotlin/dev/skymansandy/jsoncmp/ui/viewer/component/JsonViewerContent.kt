@@ -2,6 +2,8 @@ package dev.skymansandy.jsoncmp.ui.viewer.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,9 +17,9 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
-import dev.skymansandy.jsoncmp.ui.theme.monoStyle
-import dev.skymansandy.jsoncmp.ui.viewer.SearchMatch
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
+import dev.skymansandy.jsoncmp.theme.monoStyle
+import dev.skymansandy.jsoncmp.ui.viewer.model.SearchMatch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -29,8 +31,9 @@ internal fun JsonViewerContent(
     state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     searchQuery: String,
-    colors: JsonCmpColors,
 ) {
+    val colors = LocalJsonCmpColors.current
+
     val allLines = state.allLines
     val foldState = state.foldState
     val visibleLines = state.visibleLines
@@ -39,7 +42,7 @@ internal fun JsonViewerContent(
     val borderColor = colors.gutterBorder
     val density = LocalDensity.current
     var gutterWidth by remember { mutableStateOf(0.dp) }
-    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val listState = rememberLazyListState()
     val textMeasurer = rememberTextMeasurer()
     val charWidthPx = remember(textMeasurer, density) {
         textMeasurer.measure("M", monoStyle).size.width
@@ -51,23 +54,28 @@ internal fun JsonViewerContent(
     // Bumped by next/prev navigation to trigger scroll without false triggers from fold changes.
     var scrollToMatchTrigger by remember { mutableStateOf(0) }
 
+    // Re-index search matches whenever the query, visible lines, or fold state changes.
+    // Runs on Default dispatcher to avoid blocking the UI on large JSON.
     LaunchedEffect(visibleLines, searchQuery, foldState) {
         if (searchQuery.isBlank()) {
             searchMatches = emptyList()
             currentMatchIndex = 0
             return@LaunchedEffect
         }
+
         val previousQuery = searchMatches.firstOrNull()?.let { searchQuery } ?: ""
         searchMatches = withContext(Dispatchers.Default) {
             val queryLower = searchQuery.lowercase()
             buildList {
                 visibleLines.forEachIndexed { lineIdx, line ->
+                    // Find all occurrences in the visible text of this line
                     val lineText = line.parts.joinToString("") { it.text }.lowercase()
                     var idx = lineText.indexOf(queryLower)
                     while (idx >= 0) {
                         add(SearchMatch(lineIdx = lineIdx, charOffset = idx))
                         idx = lineText.indexOf(queryLower, idx + queryLower.length)
                     }
+                    // Also count matches hidden inside collapsed folds
                     val foldedCount = state.countFoldedMatches(line, searchQuery)
                     repeat(foldedCount) { add(SearchMatch(lineIdx = lineIdx, charOffset = 0)) }
                 }
@@ -100,6 +108,7 @@ internal fun JsonViewerContent(
             val visibleStart = horizontalScrollState.value + gutterPx
             val visibleEnd = horizontalScrollState.value + viewport
 
+            // Scroll to the search occurrence
             if (matchX < visibleStart || matchX + charWidthPx * searchQuery.length > visibleEnd) {
                 val target = (matchX - viewport / 2).toInt().coerceAtLeast(0)
                 horizontalScrollState.animateScrollTo(target)
@@ -107,12 +116,15 @@ internal fun JsonViewerContent(
         }
     }
 
-    Column(modifier = modifier.background(colors.background)) {
+    Column(
+        modifier = modifier
+            .background(colors.background),
+    ) {
         if (searchQuery.isNotBlank()) {
             SearchResultsBar(
+                modifier = Modifier.fillMaxWidth(),
                 totalMatches = searchMatches.size,
                 currentMatch = currentMatchIndex,
-                colors = colors,
                 onPrevious = {
                     if (searchMatches.isNotEmpty()) {
                         currentMatchIndex = if (currentMatchIndex > 0) {
@@ -137,6 +149,7 @@ internal fun JsonViewerContent(
         }
 
         JsonViewerLineList(
+            modifier = Modifier.weight(1f).background(colors.background),
             visibleLines = visibleLines,
             numDigits = numDigits,
             listState = listState,
@@ -148,9 +161,7 @@ internal fun JsonViewerContent(
             state = state,
             onAction = onAction,
             searchQuery = searchQuery,
-            colors = colors,
             foldState = foldState,
-            modifier = Modifier.weight(1f).background(colors.background),
         )
     }
 }

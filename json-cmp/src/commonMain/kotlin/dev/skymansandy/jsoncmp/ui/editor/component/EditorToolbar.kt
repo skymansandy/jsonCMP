@@ -40,23 +40,23 @@ import androidx.compose.ui.unit.sp
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderImpl
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
-import dev.skymansandy.jsoncmp.ui.theme.monoStyle
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
+import dev.skymansandy.jsoncmp.theme.monoStyle
 import kotlinx.coroutines.launch
 
 /** Toolbar with format (beautify/compact) and sort-keys actions. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditorToolbar(
+    modifier: Modifier = Modifier,
     state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
-    colors: JsonCmpColors,
 ) {
+    val colors = LocalJsonCmpColors.current
     var showSortSheet by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .background(colors.gutterBackground)
             .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -64,6 +64,7 @@ internal fun EditorToolbar(
     ) {
         // Format: Beautify / Compact toggle
         val formatLabel = if (state.isCompact) "Beautify" else "Compact"
+
         TooltipBox(
             positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
             tooltip = { PlainTooltip { Text(formatLabel) } },
@@ -82,7 +83,7 @@ internal fun EditorToolbar(
             }
         }
 
-        ToolbarDivider(colors)
+        ToolbarDivider()
 
         // Sort
         TooltipBox(
@@ -128,7 +129,6 @@ internal fun EditorToolbar(
 
                 SortOption(
                     label = "Sort Ascending (A \u2192 Z)",
-                    colors = colors,
                     onClick = {
                         onAction(JsonAction.SortKeys(ascending = true))
                         scope.launch {
@@ -142,8 +142,8 @@ internal fun EditorToolbar(
                 HorizontalDivider(color = colors.gutterBorder, thickness = 0.5.dp)
 
                 SortOption(
+                    modifier = Modifier.fillMaxWidth(),
                     label = "Sort Descending (Z \u2192 A)",
-                    colors = colors,
                     onClick = {
                         onAction(JsonAction.SortKeys(ascending = false))
                         scope.launch {
@@ -169,9 +169,9 @@ private fun Preview_EditorToolbar() {
     val state by store.state.collectAsState()
     MaterialTheme {
         EditorToolbar(
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             onAction = store::dispatch,
-            colors = JsonCmpColors.Dark,
         )
     }
 }

@@ -18,34 +18,35 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.domain.line.JsonLine
+import dev.skymansandy.jsoncmp.helper.mocks.previewLines
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
 import dev.skymansandy.jsoncmp.ui.common.GutterCell
-import dev.skymansandy.jsoncmp.ui.preview.previewColors
-import dev.skymansandy.jsoncmp.ui.preview.previewLines
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
 
 /**
  * Viewer-mode gutter: renders [GutterCell] items in a [Column] with fold/collapse support.
  */
 @Composable
 internal fun LineGutterViewMode(
+    modifier: Modifier = Modifier,
     lines: List<JsonLine>,
     totalLineCount: Int,
     foldState: SnapshotStateMap<Int, Boolean>,
-    colors: JsonCmpColors,
-    modifier: Modifier = Modifier,
     gutterMinHeight: Dp = 0.dp,
 ) {
+    val colors = LocalJsonCmpColors.current
+    val borderColor = colors.gutterBorder
+
     val numDigits by remember(totalLineCount) {
         mutableStateOf(totalLineCount.toString().length)
     }
 
-    val borderColor = colors.gutterBorder
-
+    // DisableSelection prevents text selection from spilling into gutter cells
     DisableSelection {
         Column(
             modifier = modifier
                 .defaultMinSize(minHeight = gutterMinHeight)
                 .background(colors.gutterBackground)
+                // Right border separating gutter from content
                 .drawBehind {
                     val x = size.width
                     drawLine(
@@ -58,12 +59,13 @@ internal fun LineGutterViewMode(
         ) {
             for (line in lines) {
                 val isFolded = line.foldId != null && foldState[line.foldId] == true
+
                 GutterCell(
                     lineNumber = line.lineNumber,
                     numDigits = numDigits,
-                    colors = colors,
                     foldId = line.foldId,
                     isFolded = isFolded,
+                    // Toggle fold directly in the shared SnapshotStateMap
                     onFoldToggle = {
                         line.foldId?.let { id ->
                             foldState[id] = !(foldState[id] ?: false)
@@ -83,7 +85,6 @@ private fun Preview_LineGutter_ViewMode_Viewer() {
             lines = previewLines,
             totalLineCount = previewLines.size,
             foldState = mutableStateMapOf(),
-            colors = previewColors,
         )
     }
 }

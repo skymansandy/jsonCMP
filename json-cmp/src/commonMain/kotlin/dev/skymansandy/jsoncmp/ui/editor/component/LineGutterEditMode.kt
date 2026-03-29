@@ -17,26 +17,26 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
 import dev.skymansandy.jsoncmp.ui.common.GutterCell
-import dev.skymansandy.jsoncmp.ui.preview.previewColors
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
 
 /**
  * Editor-mode gutter: renders plain line numbers aligned to [TextLayoutResult] offsets.
  */
 @Composable
 internal fun LineGutterEditMode(
-    lineCount: Int,
-    textLayoutResult: TextLayoutResult?,
-    colors: JsonCmpColors,
     modifier: Modifier = Modifier,
+    lineCount: Int,
     gutterMinHeight: Dp = 0.dp,
+    textLayoutResult: TextLayoutResult?,
 ) {
+    val colors = LocalJsonCmpColors.current
     val borderColor = colors.gutterBorder
     val numDigits by remember(lineCount) {
         mutableStateOf(lineCount.toString().length)
     }
 
+    // Right border drawn manually to separate gutter from editor content
     val gutterModifier = modifier
         .defaultMinSize(minHeight = gutterMinHeight)
         .background(colors.gutterBackground)
@@ -50,6 +50,7 @@ internal fun LineGutterEditMode(
             )
         }
 
+    // Fallback: simple column layout when text layout isn't available yet (first frame)
     if (textLayoutResult == null || textLayoutResult.lineCount < lineCount) {
         Box(modifier = gutterModifier) {
             Column {
@@ -57,14 +58,16 @@ internal fun LineGutterEditMode(
                     GutterCell(
                         lineNumber = i,
                         numDigits = numDigits,
-                        colors = colors,
                     )
                 }
             }
         }
+
         return
     }
 
+    // Custom layout: position each gutter cell at the exact Y offset of its corresponding
+    // text line, so line numbers stay aligned even with word-wrapped or variable-height lines.
     Layout(
         modifier = gutterModifier,
         content = {
@@ -72,7 +75,6 @@ internal fun LineGutterEditMode(
                 GutterCell(
                     lineNumber = i,
                     numDigits = numDigits,
-                    colors = colors,
                 )
             }
         },
@@ -103,7 +105,6 @@ private fun Preview_LineGutter_Editor() {
         LineGutterEditMode(
             lineCount = 5,
             textLayoutResult = null,
-            colors = previewColors,
         )
     }
 }

@@ -1,5 +1,6 @@
 package dev.skymansandy.jsoncmp.ui.viewer.component
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -13,13 +14,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -27,33 +31,35 @@ import androidx.compose.ui.zIndex
 import dev.skymansandy.jsoncmp.domain.line.JsonLine
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
-import dev.skymansandy.jsoncmp.ui.common.ContentCell
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
 import dev.skymansandy.jsoncmp.ui.common.GutterCell
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.ui.common.JsonLineView
 
-/** Virtualised LazyColumn of JSON lines with a sticky gutter and horizontal scroll. */
+/** Virtualized LazyColumn of JSON lines with a sticky gutter and horizontal scroll. */
 @Suppress("LongParameterList")
 @Composable
 internal fun JsonViewerLineList(
+    modifier: Modifier = Modifier,
+    state: JsonHolderState,
     visibleLines: List<JsonLine>,
     numDigits: Int,
-    listState: androidx.compose.foundation.lazy.LazyListState,
-    horizontalScrollState: androidx.compose.foundation.ScrollState,
-    borderColor: androidx.compose.ui.graphics.Color,
-    density: androidx.compose.ui.unit.Density,
+    listState: LazyListState,
+    horizontalScrollState: ScrollState,
+    borderColor: Color,
+    density: Density,
     gutterWidth: Dp,
     onGutterWidthChange: (Dp) -> Unit,
-    state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     searchQuery: String,
-    colors: JsonCmpColors,
     foldState: Map<Int, Boolean>,
-    modifier: Modifier = Modifier,
 ) {
+    val colors = LocalJsonCmpColors.current
+
     BoxWithConstraints(modifier = modifier) {
         val viewportWidth = maxWidth
 
-        // Gutter background — behind the LazyColumn, fills remaining height
+        // Static gutter backdrop — fills the full height so the gutter area has a
+        // consistent background even below the last line of content.
         if (gutterWidth > 0.dp) {
             Box(
                 modifier = Modifier
@@ -83,6 +89,7 @@ internal fun JsonViewerLineList(
                 items = visibleLines,
                 key = { it.lineNumber },
             ) { line ->
+
                 val isFolded = line.foldId != null && foldState[line.foldId] == true
 
                 Row(
@@ -90,11 +97,12 @@ internal fun JsonViewerLineList(
                         .defaultMinSize(minWidth = viewportWidth)
                         .height(IntrinsicSize.Min),
                 ) {
+                    // Sticky gutter: offset counters horizontal scroll so it stays pinned to the left.
+                    // zIndex(1f) ensures it renders above the scrollable content.
                     DisableSelection {
                         GutterCell(
                             lineNumber = line.lineNumber,
                             numDigits = numDigits,
-                            colors = colors,
                             foldId = line.foldId,
                             isFolded = isFolded,
                             onFoldToggle = {
@@ -115,11 +123,10 @@ internal fun JsonViewerLineList(
                         )
                     }
 
-                    ContentCell(
+                    JsonLineView(
                         line = line,
                         isFolded = isFolded,
                         searchQuery = searchQuery,
-                        colors = colors,
                         onFoldToggle = {
                             line.foldId?.let { id ->
                                 onAction(JsonAction.ToggleFold(id))

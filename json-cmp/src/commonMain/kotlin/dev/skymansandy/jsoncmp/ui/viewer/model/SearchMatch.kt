@@ -1,4 +1,4 @@
-package dev.skymansandy.jsoncmp.ui.viewer
+package dev.skymansandy.jsoncmp.ui.viewer.model
 
 /** A single search hit: visible line index and character offset within that line. */
 internal data class SearchMatch(

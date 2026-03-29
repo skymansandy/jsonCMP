@@ -11,13 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
 
 /** Thin vertical separator between toolbar buttons. */
 @Composable
-internal fun ToolbarDivider(
-    colors: JsonCmpColors,
-) {
+internal fun ToolbarDivider() {
+    val colors = LocalJsonCmpColors.current
     Spacer(modifier = Modifier.width(4.dp))
 
     Box(
@@ -39,7 +39,7 @@ private fun Preview_ToolbarDivider() {
         Row(
             modifier = Modifier.background(JsonCmpColors.Dark.gutterBackground),
         ) {
-            ToolbarDivider(colors = JsonCmpColors.Dark)
+            ToolbarDivider()
         }
     }
 }

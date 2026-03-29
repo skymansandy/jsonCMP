@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.RetainedEffect
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
-import dev.skymansandy.jsoncmp.ExperimentalJsonCmpApi
+import dev.skymansandy.jsoncmp.domain.ExperimentalJsonCmpApi
 import dev.skymansandy.jsoncmp.domain.model.JsonNode
 import dev.skymansandy.jsoncmp.domain.parser.JsonError
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
@@ -50,6 +50,13 @@ fun rememberJsonViewerState(json: String = ""): JsonViewerState {
     val store = retain {
         JsonHolderImpl(initialJson = json, isEditing = false)
     }
+
+    RetainedEffect(Unit) {
+        onRetire {
+            store.close()
+        }
+    }
+
     val state = remember { JsonViewerState(store) }
 
     // Re-parse when the caller provides new JSON
@@ -66,10 +73,6 @@ fun rememberJsonViewerState(json: String = ""): JsonViewerState {
             state.parsedJson = storeState.parsedJson
             state.error = storeState.error
         }
-    }
-
-    RetainedEffect(Unit) {
-        onRetire { store.close() }
     }
 
     return state

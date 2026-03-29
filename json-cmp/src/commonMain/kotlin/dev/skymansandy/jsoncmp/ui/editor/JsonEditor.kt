@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,12 +36,14 @@ import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderImpl
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
+import dev.skymansandy.jsoncmp.helper.mocks.previewJson
+import dev.skymansandy.jsoncmp.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
+import dev.skymansandy.jsoncmp.theme.monoStyle
 import dev.skymansandy.jsoncmp.ui.common.highlightJson
 import dev.skymansandy.jsoncmp.ui.editor.component.EditorToolbar
 import dev.skymansandy.jsoncmp.ui.editor.component.ErrorBanner
 import dev.skymansandy.jsoncmp.ui.editor.component.LineGutterEditMode
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
-import dev.skymansandy.jsoncmp.ui.theme.monoStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -47,20 +52,21 @@ import kotlinx.coroutines.withContext
 internal fun JsonEditor(
     modifier: Modifier = Modifier,
     state: JsonHolderState,
-    onAction: (JsonAction) -> Unit,
     searchQuery: String,
-    colors: JsonCmpColors,
+    onAction: (JsonAction) -> Unit,
 ) {
+    val colors = LocalJsonCmpColors.current
+
     var textFieldValue by remember { mutableStateOf(TextFieldValue(state.raw)) }
-    var lastStateRaw by remember { mutableStateOf(state.raw) }
 
     // Sync from store when the raw text changes externally (format, sort, etc.)
-    if (state.raw != lastStateRaw) {
-        textFieldValue = textFieldValue.copy(
-            text = state.raw,
-            selection = textFieldValue.selection.constrain(state.raw.length),
-        )
-        lastStateRaw = state.raw
+    LaunchedEffect(state.raw) {
+        if (state.raw != textFieldValue.text) {
+            textFieldValue = textFieldValue.copy(
+                text = state.raw,
+                selection = textFieldValue.selection.constrain(state.raw.length),
+            )
+        }
     }
 
     val horizontalScrollState = rememberScrollState()
@@ -68,6 +74,7 @@ internal fun JsonEditor(
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
     val focusRequester = remember { FocusRequester() }
+
     // Syntax highlighting runs off the main thread to avoid jank on large inputs
     val highlighted by produceState(
         initialValue = AnnotatedString(textFieldValue.text),
@@ -86,14 +93,14 @@ internal fun JsonEditor(
         modifier = modifier.background(colors.background),
     ) {
         EditorToolbar(
+            modifier = Modifier.fillMaxWidth(),
             state = state,
             onAction = onAction,
-            colors = colors,
         )
 
         ErrorBanner(
+            modifier = Modifier.fillMaxWidth(),
             error = state.error,
-            colors = colors,
         )
 
         BoxWithConstraints(
@@ -121,7 +128,6 @@ internal fun JsonEditor(
                 LineGutterEditMode(
                     lineCount = lineCount,
                     textLayoutResult = textLayoutResult,
-                    colors = colors,
                     gutterMinHeight = gutterMinHeight,
                 )
 
@@ -130,7 +136,6 @@ internal fun JsonEditor(
                     value = textFieldValue.copy(annotatedString = highlighted),
                     onValueChange = { newValue ->
                         textFieldValue = newValue
-                        lastStateRaw = newValue.text
                         onAction(JsonAction.UpdateJson(newValue.text))
                     },
                     onTextLayout = { textLayoutResult = it },
@@ -154,29 +159,19 @@ private fun TextRange.constrain(maxLength: Int): TextRange {
 }
 
 // ── Previews ──
-
-private val previewJson = """
-{
-    "name": "John Doe",
-    "age": 30,
-    "isActive": true
-}
-""".trimIndent()
-
-private val previewColors = JsonCmpColors.Dark
-
 @Preview
 @Composable
 private fun Preview_JsonEditor() {
     val store = remember { JsonHolderImpl(initialJson = previewJson, isEditing = true) }
     val state by store.state.collectAsState()
     MaterialTheme {
-        JsonEditor(
-            state = state,
-            onAction = store::dispatch,
-            searchQuery = "",
-            colors = previewColors,
-        )
+        CompositionLocalProvider(LocalJsonCmpColors provides JsonCmpColors.Dark) {
+            JsonEditor(
+                state = state,
+                onAction = store::dispatch,
+                searchQuery = "",
+            )
+        }
     }
 }
 
@@ -186,11 +181,12 @@ private fun Preview_JsonEditorWithSearch() {
     val store = remember { JsonHolderImpl(initialJson = previewJson, isEditing = true) }
     val state by store.state.collectAsState()
     MaterialTheme {
-        JsonEditor(
-            state = state,
-            onAction = store::dispatch,
-            searchQuery = "age",
-            colors = previewColors,
-        )
+        CompositionLocalProvider(LocalJsonCmpColors provides JsonCmpColors.Dark) {
+            JsonEditor(
+                state = state,
+                onAction = store::dispatch,
+                searchQuery = "age",
+            )
+        }
     }
 }

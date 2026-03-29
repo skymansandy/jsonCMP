@@ -1,11 +1,13 @@
 package dev.skymansandy.jsoncmp.ui.viewer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import dev.skymansandy.jsoncmp.ExperimentalJsonCmpApi
-import dev.skymansandy.jsoncmp.ui.theme.JsonTheme
+import dev.skymansandy.jsoncmp.domain.ExperimentalJsonCmpApi
+import dev.skymansandy.jsoncmp.theme.JsonTheme
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
 
 /**
  * Read-only JSON viewer composable with virtualized rendering.
@@ -21,18 +23,19 @@ import dev.skymansandy.jsoncmp.ui.theme.JsonTheme
 @ExperimentalJsonCmpApi
 @Composable
 fun JsonViewerCMP(
-    state: JsonViewerState,
     modifier: Modifier = Modifier,
+    state: JsonViewerState,
     searchQuery: String = "",
     theme: JsonTheme = JsonTheme.Dark,
 ) {
     val storeState by state.store.state.collectAsState()
 
-    JsonViewer(
-        modifier = modifier,
-        state = storeState,
-        onAction = state.store::dispatch,
-        searchQuery = searchQuery,
-        colors = theme.colors,
-    )
+    CompositionLocalProvider(LocalJsonCmpColors provides theme.colors) {
+        JsonViewer(
+            modifier = modifier,
+            state = storeState,
+            onAction = state.store::dispatch,
+            searchQuery = searchQuery,
+        )
+    }
 }

@@ -5,15 +5,16 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import dev.skymansandy.jsoncmp.domain.highlighter.Token
 import dev.skymansandy.jsoncmp.domain.highlighter.TokenType
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.theme.JsonCmpColors
 
-/** Tokenises [text] and returns an [AnnotatedString] with syntax colours and search highlights. */
+/** Tokenises [text] and returns an [AnnotatedString] with syntax colors and search highlights. */
 internal fun highlightJson(
     text: String,
     searchQuery: String,
     colors: JsonCmpColors,
 ): AnnotatedString = buildAnnotatedString {
 
+    // Base layer: default all text to punctuation color, then overlay token-specific colors
     append(text)
     addStyle(SpanStyle(color = colors.punctuation), 0, text.length)
 
@@ -30,6 +31,7 @@ internal fun highlightJson(
         addStyle(SpanStyle(color = color), token.start, token.end)
     }
 
+    // Overlay search highlights on top of syntax colors (case-insensitive)
     if (searchQuery.isNotBlank()) {
         val lowerText = text.lowercase()
         val lowerQuery = searchQuery.lowercase()
@@ -45,6 +47,8 @@ internal fun highlightJson(
     }
 }
 
+/** Single-pass lexer that produces [Token]s for JSON syntax elements. Handles escaped strings,
+ *  integers/decimals/scientific notation, boolean/null literals, and structural punctuation. */
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 private fun tokenizeJson(text: String): List<Token> {
     val tokens = mutableListOf<Token>()
@@ -68,6 +72,7 @@ private fun tokenizeJson(text: String): List<Token> {
                         else -> pos++
                     }
                 }
+                // A quoted string followed by ':' is a key, otherwise a value
                 val isKey = isFollowedByColon(text, pos, len)
                 tokens += Token(if (isKey) TokenType.Key else TokenType.String, start, pos)
             }
@@ -123,6 +128,7 @@ private fun tokenizeJson(text: String): List<Token> {
     return tokens
 }
 
+/** Skips whitespace after [from] and checks for ':', used to distinguish keys from string values. */
 private fun isFollowedByColon(text: String, from: Int, len: Int): Boolean {
     var i = from
     while (i < len && text[i].isWhitespace()) i++

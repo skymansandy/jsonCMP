@@ -12,22 +12,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
-import dev.skymansandy.jsoncmp.ui.theme.monoStyle
+import dev.skymansandy.jsoncmp.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
+import dev.skymansandy.jsoncmp.theme.monoStyle
 
 /** A tappable label row used inside the sort bottom sheet. */
 @Composable
 internal fun SortOption(
+    modifier: Modifier = Modifier,
     label: String,
-    colors: JsonCmpColors,
     onClick: () -> Unit,
 ) {
+    val colors = LocalJsonCmpColors.current
+
     Text(
         text = label,
         style = monoStyle.copy(fontSize = 13.sp),
         color = colors.punctuation,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .clickable(onClick = onClick)
             .padding(vertical = 14.dp),
     )
@@ -45,8 +47,8 @@ private fun Preview_SortOption() {
                 .background(JsonCmpColors.Dark.gutterBackground),
         ) {
             SortOption(
+                modifier = Modifier.fillMaxWidth(),
                 label = "Sort Ascending (A \u2192 Z)",
-                colors = JsonCmpColors.Dark,
                 onClick = {},
             )
         }

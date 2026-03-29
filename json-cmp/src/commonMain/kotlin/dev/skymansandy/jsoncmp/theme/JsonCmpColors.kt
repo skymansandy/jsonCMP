@@ -1,9 +1,13 @@
-package dev.skymansandy.jsoncmp.ui.theme
+package dev.skymansandy.jsoncmp.theme
 
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import dev.skymansandy.jsoncmp.domain.line.JsonPart
 
-/** Full colour palette for JSON syntax, gutter, search highlights, and errors. */
+/** CompositionLocal providing the current [JsonCmpColors] palette. */
+val LocalJsonCmpColors = compositionLocalOf { JsonCmpColors.Dark }
+
+/** Full color palette for JSON syntax, gutter, search highlights, and errors. */
 data class JsonCmpColors(
     val key: Color,
     val string: Color,

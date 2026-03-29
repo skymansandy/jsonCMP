@@ -1,9 +1,9 @@
-package dev.skymansandy.jsoncmp.ui.preview
+package dev.skymansandy.jsoncmp.helper.mocks
 
 import dev.skymansandy.jsoncmp.domain.line.JsonLine
 import dev.skymansandy.jsoncmp.domain.line.JsonPart
 import dev.skymansandy.jsoncmp.domain.model.FoldType
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.theme.JsonCmpColors
 
 internal val previewColors = JsonCmpColors.Dark
 
@@ -69,3 +69,11 @@ internal val previewFoldableLine = JsonLine(
     parentFoldIds = emptyList(),
     foldChildCount = 3,
 )
+
+internal val previewJson = """
+{
+    "name": "John Doe",
+    "age": 30,
+    "isActive": true
+}
+""".trimIndent()

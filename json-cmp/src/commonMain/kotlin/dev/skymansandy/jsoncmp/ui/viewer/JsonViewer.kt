@@ -2,6 +2,7 @@ package dev.skymansandy.jsoncmp.ui.viewer
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -10,7 +11,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderImpl
 import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.helper.mocks.previewJson
+import dev.skymansandy.jsoncmp.theme.JsonCmpColors
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
 import dev.skymansandy.jsoncmp.ui.viewer.component.JsonViewerContent
 import dev.skymansandy.jsoncmp.ui.viewer.component.JsonViewerEmptyState
 
@@ -21,41 +24,39 @@ internal fun JsonViewer(
     state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     searchQuery: String,
-    colors: JsonCmpColors,
 ) {
     if (state.allLines.isEmpty()) {
-        JsonViewerEmptyState(modifier, state, searchQuery, colors)
+        JsonViewerEmptyState(
+            modifier = modifier,
+            state = state,
+            searchQuery = searchQuery,
+        )
+
         return
     }
 
-    JsonViewerContent(modifier, state, onAction, searchQuery, colors)
+    JsonViewerContent(
+        modifier = modifier,
+        state = state,
+        onAction = onAction,
+        searchQuery = searchQuery,
+    )
 }
 
 // ── Previews ──
-
-private val previewJson = """
-{
-    "name": "John Doe",
-    "age": 30,
-    "isActive": true,
-    "tags": ["developer", "kotlin"]
-}
-""".trimIndent()
-
-private val previewColors = JsonCmpColors.Dark
-
 @Preview
 @Composable
 private fun Preview_JsonViewer() {
     val store = remember { JsonHolderImpl(initialJson = previewJson) }
     val state by store.state.collectAsState()
     MaterialTheme {
-        JsonViewer(
-            state = state,
-            onAction = store::dispatch,
-            searchQuery = "",
-            colors = previewColors,
-        )
+        CompositionLocalProvider(LocalJsonCmpColors provides JsonCmpColors.Dark) {
+            JsonViewer(
+                state = state,
+                onAction = store::dispatch,
+                searchQuery = "",
+            )
+        }
     }
 }
 
@@ -65,11 +66,12 @@ private fun Preview_JsonViewerWithSearch() {
     val store = remember { JsonHolderImpl(initialJson = previewJson) }
     val state by store.state.collectAsState()
     MaterialTheme {
-        JsonViewer(
-            state = state,
-            onAction = store::dispatch,
-            searchQuery = "John",
-            colors = previewColors,
-        )
+        CompositionLocalProvider(LocalJsonCmpColors provides JsonCmpColors.Dark) {
+            JsonViewer(
+                state = state,
+                onAction = store::dispatch,
+                searchQuery = "John",
+            )
+        }
     }
 }

@@ -10,14 +10,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.ui.preview.previewColors
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
-import dev.skymansandy.jsoncmp.ui.theme.monoStyle
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
+import dev.skymansandy.jsoncmp.theme.monoStyle
 
 /** Fallback text display for invalid/unparseable JSON with optional search highlighting. */
 @Composable
@@ -25,22 +25,25 @@ internal fun PlainText(
     modifier: Modifier = Modifier,
     text: String,
     searchQuery: String,
-    colors: JsonCmpColors,
 ) {
-    val annotated = buildAnnotatedString {
-        append(text)
-        addStyle(SpanStyle(color = colors.punctuation), 0, text.length)
-        if (searchQuery.isNotBlank()) {
-            val lowerText = text.lowercase()
-            val lowerQuery = searchQuery.lowercase()
-            var idx = lowerText.indexOf(lowerQuery)
-            while (idx >= 0) {
-                addStyle(
-                    SpanStyle(background = colors.highlight, color = colors.highlightFg),
-                    idx,
-                    idx + lowerQuery.length,
-                )
-                idx = lowerText.indexOf(lowerQuery, idx + lowerQuery.length)
+    val colors = LocalJsonCmpColors.current
+
+    val annotated = remember(text, searchQuery, colors) {
+        buildAnnotatedString {
+            append(text)
+            addStyle(SpanStyle(color = colors.punctuation), 0, text.length)
+            if (searchQuery.isNotBlank()) {
+                val lowerText = text.lowercase()
+                val lowerQuery = searchQuery.lowercase()
+                var idx = lowerText.indexOf(lowerQuery)
+                while (idx >= 0) {
+                    addStyle(
+                        SpanStyle(background = colors.highlight, color = colors.highlightFg),
+                        idx,
+                        idx + lowerQuery.length,
+                    )
+                    idx = lowerText.indexOf(lowerQuery, idx + lowerQuery.length)
+                }
             }
         }
     }
@@ -70,7 +73,6 @@ private fun Preview_PlainText() {
         PlainText(
             text = "This is plain, unparseable text content",
             searchQuery = "",
-            colors = previewColors,
         )
     }
 }
@@ -82,7 +84,6 @@ private fun Preview_PlainTextWithSearch() {
         PlainText(
             text = "This is plain, unparseable text content",
             searchQuery = "plain",
-            colors = previewColors,
         )
     }
 }

@@ -14,21 +14,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.skymansandy.jsoncmp.domain.parser.JsonError
-import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
-import dev.skymansandy.jsoncmp.ui.theme.monoStyle
+import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
+import dev.skymansandy.jsoncmp.theme.monoStyle
 
 /** Displays a parse error in a red banner; hidden when [error] is null. */
 @Composable
 internal fun ErrorBanner(
+    modifier: Modifier = Modifier,
     error: JsonError?,
-    colors: JsonCmpColors,
 ) {
     if (error == null) return
+    val colors = LocalJsonCmpColors.current
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .background(colors.errorBackground)
             .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
@@ -56,11 +56,11 @@ internal fun ErrorBanner(
 private fun Preview_ErrorBanner() {
     MaterialTheme {
         ErrorBanner(
+            modifier = Modifier.fillMaxWidth(),
             error = JsonError(
                 message = "Unexpected token '}' at position 23",
                 position = 23,
             ),
-            colors = JsonCmpColors.Dark,
         )
     }
 }
@@ -70,8 +70,8 @@ private fun Preview_ErrorBanner() {
 private fun Preview_ErrorBannerNull() {
     MaterialTheme {
         ErrorBanner(
+            modifier = Modifier.fillMaxWidth(),
             error = null,
-            colors = JsonCmpColors.Dark,
         )
     }
 }
