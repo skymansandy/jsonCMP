@@ -38,8 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.ExperimentalJsonCmpApi
 import dev.skymansandy.jsoncmp.ui.editor.JsonEditorCMP
+import dev.skymansandy.jsoncmp.ui.editor.rememberJsonEditorState
 import dev.skymansandy.jsoncmp.ui.theme.JsonTheme
 import dev.skymansandy.jsoncmp.ui.viewer.JsonViewerCMP
+import dev.skymansandy.jsoncmp.ui.viewer.rememberJsonViewerState
 import dev.skymansandy.jsoncmpsample.data.sampleJson
 import jsoncmp.composeapp.generated.resources.Res
 import kotlinx.coroutines.Dispatchers
@@ -78,6 +80,10 @@ fun App() {
         }
 
         val viewerJson = if (showInvalidJson) "$fiveMbJson!!!" else fiveMbJson
+        val viewerState = rememberJsonViewerState(json = viewerJson)
+
+        val editorJson = if (showInvalidJson) fiveMbJson else sampleJson
+        val editorState = rememberJsonEditorState(initialJson = editorJson)
 
         Scaffold(
             topBar = {
@@ -172,20 +178,17 @@ fun App() {
 
                 when (selectedTab) {
                     0 -> JsonViewerCMP(
-                        json = viewerJson,
+                        state = viewerState,
                         modifier = Modifier.fillMaxWidth().weight(1f),
                         searchQuery = searchQuery,
                         theme = selectedTheme,
                     )
-                    1 -> {
-                        val editorJson = if (showInvalidJson) fiveMbJson else sampleJson
-                        JsonEditorCMP(
-                            json = editorJson,
-                            modifier = Modifier.fillMaxWidth().weight(1f),
-                            searchQuery = searchQuery,
-                            theme = selectedTheme,
-                        )
-                    }
+                    1 -> JsonEditorCMP(
+                        state = editorState,
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        searchQuery = searchQuery,
+                        theme = selectedTheme,
+                    )
                 }
             }
         }

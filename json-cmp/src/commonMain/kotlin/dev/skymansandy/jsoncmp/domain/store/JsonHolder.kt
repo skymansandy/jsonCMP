@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 /** Reactive state holder for JSON content — parsing, folding, formatting, and sorting. */
 @Stable
-interface JsonStore {
+internal interface JsonHolder {
 
-    val state: StateFlow<JsonStoreState>
+    val state: StateFlow<JsonHolderState>
 
     fun dispatch(action: JsonAction)
 }

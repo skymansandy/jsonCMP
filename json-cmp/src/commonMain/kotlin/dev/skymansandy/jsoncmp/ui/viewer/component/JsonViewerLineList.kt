@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import dev.skymansandy.jsoncmp.domain.line.JsonLine
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreState
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
 import dev.skymansandy.jsoncmp.ui.common.ContentCell
 import dev.skymansandy.jsoncmp.ui.common.GutterCell
 import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
@@ -43,7 +43,7 @@ internal fun JsonViewerLineList(
     density: androidx.compose.ui.unit.Density,
     gutterWidth: Dp,
     onGutterWidthChange: (Dp) -> Unit,
-    state: JsonStoreState,
+    state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     searchQuery: String,
     colors: JsonCmpColors,

@@ -5,18 +5,29 @@ import dev.skymansandy.jsoncmp.domain.model.JsonNode
 import dev.skymansandy.jsoncmp.domain.model.JsonPath
 import dev.skymansandy.jsoncmp.domain.model.PathSegment
 
-/** Converts a [JsonNode] tree into a flat list of [JsonLine]s for display. */
+/**
+ * Converts a [JsonNode] tree into a flat list of [JsonLine]s for display.
+ *
+ * The builder walks the tree depth-first, emitting one [JsonLine] per visual line
+ * (opening brackets, key-value pairs, closing brackets). Foldable containers
+ * (non-empty objects/arrays) are assigned a unique [foldId] so the UI can
+ * collapse/expand them independently.
+ */
 internal class JsonLineBuilder {
 
     private val out = mutableListOf<JsonLine>()
     private var lineNum = 0
     private var nextFoldId = 0
 
-    /** Maps headerIdx (index in [out]) to the fold's closing-bracket index + 1. */
+    /**
+     * Tracks the index in [out] where each foldable header line was emitted.
+     * After the full tree walk, a post-pass uses these to compute [JsonLine.childEndIndex]
+     * for O(1) fold-skipping in the visible-line builder.
+     */
     private val foldHeaders = mutableListOf<Int>()
 
+    /** Walks the tree and returns the complete flat line list with fold metadata attached. */
     fun build(root: JsonNode): List<JsonLine> {
-
         addNode(
             root,
             key = null,
@@ -26,12 +37,13 @@ internal class JsonLineBuilder {
             path = emptyList(),
         )
 
-        // Post-pass: set childEndIndex for each foldable header line.
+        // Post-pass: for each fold header, scan forward to find where its children end.
+        // A child belongs to a fold if its parentFoldIds contains the fold's id.
+        // The first line that does NOT contain the foldId marks the boundary (the closing bracket).
+        // childEndIndex points one past the closing bracket so the viewer can skip the entire block.
         for (headerIdx in foldHeaders) {
             val header = out[headerIdx]
             val foldId = header.foldId ?: continue
-            // Find the closing bracket: it's the next line after all children
-            // whose parentFoldIds contains this foldId.
             var endIdx = headerIdx + 1
             while (endIdx < out.size && foldId in out[endIdx].parentFoldIds) {
                 endIdx++
@@ -42,6 +54,16 @@ internal class JsonLineBuilder {
         return out
     }
 
+    /**
+     * Recursively emits lines for [node] and its children.
+     *
+     * @param key Object key if this node is a value in a parent object, null for root or array elements.
+     * @param isLast True if this is the last sibling — suppresses the trailing comma.
+     * @param depth Nesting level, used for indentation (2 spaces per level).
+     * @param parentFoldIds Fold IDs of all ancestor containers — used to determine which
+     *   folds a line belongs to, enabling collapse to hide the right lines.
+     * @param path JSON path segments from root to this node, e.g. [Key("user"), Key("name")].
+     */
     @Suppress("LongMethod")
     private fun addNode(
         node: JsonNode,
@@ -51,8 +73,9 @@ internal class JsonLineBuilder {
         parentFoldIds: List<Int>,
         path: JsonPath,
     ) {
-
-        val indent: List<JsonPart> = if (depth > 0) listOf(JsonPart.Indent("  ".repeat(depth))) else emptyList()
+        // Common parts shared by all node types
+        val indent: List<JsonPart> =
+            if (depth > 0) listOf(JsonPart.Indent("  ".repeat(depth))) else emptyList()
         val keyParts: List<JsonPart> = if (key != null) {
             listOf(JsonPart.Key("\"$key\""), JsonPart.Punct(": "))
         } else emptyList()
@@ -60,12 +83,14 @@ internal class JsonLineBuilder {
 
         when (node) {
             is JsonNode.JObject -> {
+                // Empty objects render as a single "{}" line — no fold needed
                 if (node.fields.isEmpty()) {
                     out += JsonLine(
                         ++lineNum, depth, indent + keyParts + JsonPart.Punct("{}") + comma,
                         null, null, parentFoldIds, path = path,
                     )
                 } else {
+                    // Assign a fold ID and record this header's position for the post-pass
                     val myId = nextFoldId++
                     val headerIdx = out.size
                     out += JsonLine(
@@ -74,6 +99,8 @@ internal class JsonLineBuilder {
                         foldChildCount = node.fields.size, path = path,
                     )
                     foldHeaders += headerIdx
+
+                    // Children inherit all ancestor fold IDs plus this container's ID
                     val childParents = parentFoldIds + myId
                     node.fields.forEachIndexed { i, (k, v) ->
                         addNode(
@@ -81,6 +108,8 @@ internal class JsonLineBuilder {
                             childParents, path = path + PathSegment.Key(k),
                         )
                     }
+
+                    // Closing bracket — belongs to the same fold group as children
                     out += JsonLine(
                         ++lineNum, depth, indent + listOf(JsonPart.Punct("}")) + comma,
                         null, null, childParents, isClosingBracket = true, path = path,
@@ -89,6 +118,7 @@ internal class JsonLineBuilder {
             }
 
             is JsonNode.JArray -> {
+                // Empty arrays render as a single "[]" line — no fold needed
                 if (node.elements.isEmpty()) {
                     out += JsonLine(
                         ++lineNum, depth, indent + keyParts + JsonPart.Punct("[]") + comma,
@@ -103,6 +133,7 @@ internal class JsonLineBuilder {
                         foldChildCount = node.elements.size, path = path,
                     )
                     foldHeaders += headerIdx
+
                     val childParents = parentFoldIds + myId
                     node.elements.forEachIndexed { i, v ->
                         addNode(
@@ -110,6 +141,7 @@ internal class JsonLineBuilder {
                             childParents, path = path + PathSegment.Index(i),
                         )
                     }
+
                     out += JsonLine(
                         ++lineNum, depth, indent + listOf(JsonPart.Punct("]")) + comma,
                         null, null, childParents, isClosingBracket = true, path = path,
@@ -117,7 +149,10 @@ internal class JsonLineBuilder {
                 }
             }
 
+            // Leaf nodes: no fold, no children — just emit a single line
+
             is JsonNode.JString -> {
+                // Escape special characters for display (keeps the visual output valid JSON)
                 val escaped = node.value
                     .replace("\\", "\\\\").replace("\"", "\\\"")
                     .replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t")
@@ -135,8 +170,13 @@ internal class JsonLineBuilder {
 
             is JsonNode.JBoolean ->
                 out += JsonLine(
-                    ++lineNum, depth, indent + keyParts + JsonPart.BoolVal(node.value.toString()) + comma,
-                    null, null, parentFoldIds, path = path,
+                    ++lineNum,
+                    depth,
+                    indent + keyParts + JsonPart.BoolVal(node.value.toString()) + comma,
+                    null,
+                    null,
+                    parentFoldIds,
+                    path = path,
                 )
 
             is JsonNode.JNull ->
@@ -148,4 +188,7 @@ internal class JsonLineBuilder {
     }
 }
 
-internal fun buildDisplayLines(root: JsonNode): List<JsonLine> = JsonLineBuilder().build(root)
+/** Convenience entry point — creates a builder, walks the tree, and returns the flat line list. */
+internal fun buildDisplayLines(root: JsonNode): List<JsonLine> {
+    return JsonLineBuilder().build(root)
+}

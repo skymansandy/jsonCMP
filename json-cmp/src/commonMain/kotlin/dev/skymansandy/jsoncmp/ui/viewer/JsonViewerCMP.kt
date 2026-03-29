@@ -1,54 +1,37 @@
 package dev.skymansandy.jsoncmp.ui.viewer
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import dev.skymansandy.jsoncmp.ExperimentalJsonCmpApi
-import dev.skymansandy.jsoncmp.domain.model.JsonNode
-import dev.skymansandy.jsoncmp.domain.parser.JsonError
-import dev.skymansandy.jsoncmp.rememberJsonStore
 import dev.skymansandy.jsoncmp.ui.theme.JsonTheme
 
 /**
- * Read-only JSON viewer composable.
+ * Read-only JSON viewer composable with virtualized rendering.
  *
- * No size restriction for valid JSON (virtualized rendering).
- * Invalid JSON falls back to plain text with a 100 KB preview limit.
+ * Observe state via [JsonViewerState.json], [JsonViewerState.parsedJson],
+ * and [JsonViewerState.error] — no callbacks needed.
  *
- * @param json The JSON string to display.
- * @param modifier Layout modifier.
- * @param searchQuery Optional search query to highlight matches.
- * @param theme Visual theme for the viewer.
- * @param onJsonParsed Callback invoked when parsing completes.
+ * @param state state holder created via [rememberJsonViewerState].
+ * @param modifier layout modifier.
+ * @param searchQuery optional search query to highlight matches.
+ * @param theme visual theme for the viewer.
  */
 @ExperimentalJsonCmpApi
 @Composable
 fun JsonViewerCMP(
+    state: JsonViewerState,
     modifier: Modifier = Modifier,
-    json: String,
     searchQuery: String = "",
     theme: JsonTheme = JsonTheme.Dark,
-    onJsonParsed: (
-        parsed: JsonNode?,
-        error: JsonError?,
-    ) -> Unit = { _, _ -> },
 ) {
-    val store = rememberJsonStore(
-        initialJson = json,
-        isEditing = false,
-    )
-    val state by store.state.collectAsState()
-
-    LaunchedEffect(state.parsedJson, state.error) {
-        onJsonParsed(state.parsedJson, state.error)
-    }
+    val storeState by state.store.state.collectAsState()
 
     JsonViewer(
         modifier = modifier,
-        state = state,
-        onAction = store::dispatch,
+        state = storeState,
+        onAction = state.store::dispatch,
         searchQuery = searchQuery,
         colors = theme.colors,
     )

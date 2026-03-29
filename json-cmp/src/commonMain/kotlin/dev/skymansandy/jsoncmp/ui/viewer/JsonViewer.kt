@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreImpl
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreState
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderImpl
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
 import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
 import dev.skymansandy.jsoncmp.ui.viewer.component.JsonViewerContent
 import dev.skymansandy.jsoncmp.ui.viewer.component.JsonViewerEmptyState
@@ -18,7 +18,7 @@ import dev.skymansandy.jsoncmp.ui.viewer.component.JsonViewerEmptyState
 @Composable
 internal fun JsonViewer(
     modifier: Modifier = Modifier,
-    state: JsonStoreState,
+    state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     searchQuery: String,
     colors: JsonCmpColors,
@@ -47,7 +47,7 @@ private val previewColors = JsonCmpColors.Dark
 @Preview
 @Composable
 private fun Preview_JsonViewer() {
-    val store = remember { JsonStoreImpl(initialJson = previewJson) }
+    val store = remember { JsonHolderImpl(initialJson = previewJson) }
     val state by store.state.collectAsState()
     MaterialTheme {
         JsonViewer(
@@ -62,7 +62,7 @@ private fun Preview_JsonViewer() {
 @Preview
 @Composable
 private fun Preview_JsonViewerWithSearch() {
-    val store = remember { JsonStoreImpl(initialJson = previewJson) }
+    val store = remember { JsonHolderImpl(initialJson = previewJson) }
     val state by store.state.collectAsState()
     MaterialTheme {
         JsonViewer(

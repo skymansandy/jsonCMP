@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreState
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
 import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
 import dev.skymansandy.jsoncmp.ui.theme.monoStyle
 import dev.skymansandy.jsoncmp.ui.viewer.SearchMatch
@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 @Composable
 internal fun JsonViewerContent(
     modifier: Modifier,
-    state: JsonStoreState,
+    state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     searchQuery: String,
     colors: JsonCmpColors,

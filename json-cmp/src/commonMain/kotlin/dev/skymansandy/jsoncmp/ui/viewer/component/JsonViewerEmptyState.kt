@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreState
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
 import dev.skymansandy.jsoncmp.ui.common.PlainText
 import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
 import dev.skymansandy.jsoncmp.ui.theme.monoStyle
@@ -23,7 +23,7 @@ import dev.skymansandy.jsoncmp.ui.theme.monoStyle
 @Composable
 internal fun JsonViewerEmptyState(
     modifier: Modifier,
-    state: JsonStoreState,
+    state: JsonHolderState,
     searchQuery: String,
     colors: JsonCmpColors,
 ) {

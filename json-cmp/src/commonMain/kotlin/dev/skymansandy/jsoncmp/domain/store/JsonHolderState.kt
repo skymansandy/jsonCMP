@@ -6,22 +6,22 @@ import dev.skymansandy.jsoncmp.domain.parser.JsonError
 
 /** Immutable snapshot of the store's state — raw text, parsed tree, lines, and fold state. */
 @Suppress("LongParameterList")
-class JsonStoreState internal constructor(
+internal class JsonHolderState(
     val raw: String = "",
     val parsedJson: JsonNode? = null,
     val error: JsonError? = null,
     val isParsing: Boolean = false,
     val isCompact: Boolean = false,
     val isEditing: Boolean = false,
-    internal val allLines: List<JsonLine> = emptyList(),
+    val allLines: List<JsonLine> = emptyList(),
     val foldState: Map<Int, Boolean> = emptyMap(),
 ) {
-    internal val visibleLines: List<JsonLine> by lazy {
+    val visibleLines: List<JsonLine> by lazy {
         buildVisibleLines(allLines, foldState)
     }
 
     @Suppress("LongParameterList")
-    internal fun copy(
+    fun copy(
         raw: String = this.raw,
         parsedJson: JsonNode? = this.parsedJson,
         error: JsonError? = this.error,
@@ -30,7 +30,7 @@ class JsonStoreState internal constructor(
         isEditing: Boolean = this.isEditing,
         allLines: List<JsonLine> = this.allLines,
         foldState: Map<Int, Boolean> = this.foldState,
-    ): JsonStoreState = JsonStoreState(
+    ): JsonHolderState = JsonHolderState(
         raw = raw,
         parsedJson = parsedJson,
         error = error,
@@ -41,7 +41,7 @@ class JsonStoreState internal constructor(
         foldState = foldState,
     )
 
-    internal fun computeFoldedContent(line: JsonLine): String {
+    fun computeFoldedContent(line: JsonLine): String {
         if (line.foldId == null || line.childEndIndex < 0) return ""
         val startIdx = allLines.indexOf(line)
         if (startIdx < 0) return ""
@@ -50,7 +50,7 @@ class JsonStoreState internal constructor(
             .joinToString(" ") { l -> l.parts.joinToString("") { it.text }.trim() }
     }
 
-    internal fun hasFoldedMatch(line: JsonLine, searchQuery: String): Boolean {
+    fun hasFoldedMatch(line: JsonLine, searchQuery: String): Boolean {
         if (line.foldId == null || line.childEndIndex < 0 || searchQuery.isBlank()) return false
         val startIdx = allLines.indexOf(line)
         if (startIdx < 0) return false
@@ -63,7 +63,7 @@ class JsonStoreState internal constructor(
         return false
     }
 
-    internal fun countFoldedMatches(line: JsonLine, searchQuery: String): Int {
+    fun countFoldedMatches(line: JsonLine, searchQuery: String): Int {
         if (line.foldId == null || line.childEndIndex < 0 || searchQuery.isBlank()) return 0
         if (foldState[line.foldId] != true) return 0
         val startIdx = allLines.indexOf(line)
@@ -84,7 +84,7 @@ class JsonStoreState internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is JsonStoreState) return false
+        if (other !is JsonHolderState) return false
         return raw == other.raw &&
             parsedJson == other.parsedJson &&
             error == other.error &&

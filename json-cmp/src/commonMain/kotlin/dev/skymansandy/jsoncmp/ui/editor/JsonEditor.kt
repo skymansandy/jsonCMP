@@ -31,8 +31,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreImpl
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreState
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderImpl
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
 import dev.skymansandy.jsoncmp.ui.common.highlightJson
 import dev.skymansandy.jsoncmp.ui.editor.component.EditorToolbar
 import dev.skymansandy.jsoncmp.ui.editor.component.ErrorBanner
@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 @Composable
 internal fun JsonEditor(
     modifier: Modifier = Modifier,
-    state: JsonStoreState,
+    state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     searchQuery: String,
     colors: JsonCmpColors,
@@ -168,7 +168,7 @@ private val previewColors = JsonCmpColors.Dark
 @Preview
 @Composable
 private fun Preview_JsonEditor() {
-    val store = remember { JsonStoreImpl(initialJson = previewJson, isEditing = true) }
+    val store = remember { JsonHolderImpl(initialJson = previewJson, isEditing = true) }
     val state by store.state.collectAsState()
     MaterialTheme {
         JsonEditor(
@@ -183,7 +183,7 @@ private fun Preview_JsonEditor() {
 @Preview
 @Composable
 private fun Preview_JsonEditorWithSearch() {
-    val store = remember { JsonStoreImpl(initialJson = previewJson, isEditing = true) }
+    val store = remember { JsonHolderImpl(initialJson = previewJson, isEditing = true) }
     val state by store.state.collectAsState()
     MaterialTheme {
         JsonEditor(

@@ -1,7 +1,7 @@
 package dev.skymansandy.jsoncmp.domain.store
 
-/** User-driven actions dispatched to [JsonStore]. */
-sealed class JsonAction {
+/** User-driven actions dispatched to [JsonHolder]. */
+internal sealed class JsonAction {
 
     /** Replace the raw JSON text and trigger a reparse. */
     data class UpdateJson(val raw: String) : JsonAction()

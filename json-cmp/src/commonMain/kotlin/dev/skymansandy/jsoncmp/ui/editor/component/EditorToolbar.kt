@@ -38,8 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.skymansandy.jsoncmp.domain.store.JsonAction
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreImpl
-import dev.skymansandy.jsoncmp.domain.store.JsonStoreState
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderImpl
+import dev.skymansandy.jsoncmp.domain.store.JsonHolderState
 import dev.skymansandy.jsoncmp.ui.theme.JsonCmpColors
 import dev.skymansandy.jsoncmp.ui.theme.monoStyle
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EditorToolbar(
-    state: JsonStoreState,
+    state: JsonHolderState,
     onAction: (JsonAction) -> Unit,
     colors: JsonCmpColors,
 ) {
@@ -165,7 +165,7 @@ internal fun EditorToolbar(
 @Preview
 @Composable
 private fun Preview_EditorToolbar() {
-    val store = remember { JsonStoreImpl(initialJson = """{"name": "John"}""", isEditing = true) }
+    val store = remember { JsonHolderImpl(initialJson = """{"name": "John"}""", isEditing = true) }
     val state by store.state.collectAsState()
     MaterialTheme {
         EditorToolbar(

@@ -1,5 +1,6 @@
 package dev.skymansandy.jsoncmp.domain.parser
 
+import dev.skymansandy.jsoncmp.domain.line.buildDisplayLines
 import dev.skymansandy.jsoncmp.domain.model.JsonNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,8 +23,23 @@ private val json = Json {
     allowSpecialFloatingPointValues = true
 }
 
+/** Main-safe: parses raw JSON and builds display lines on [Dispatchers.Default]. */
+internal suspend fun parseAndBuildLines(
+    raw: String,
+): ParseResult = withContext(Dispatchers.Default) {
+    val trimmed = raw.trim()
+    if (trimmed.isEmpty()) return@withContext ParseResult.Empty
+
+    val (node, err) = parseJsonResult(trimmed)
+    if (node != null) {
+        ParseResult.Success(node, buildDisplayLines(node))
+    } else {
+        ParseResult.Failure(err)
+    }
+}
+
 /** Parses [input] into a [JsonNode] tree, returning (node, null) on success or (null, error) on failure. */
-internal suspend fun parseJsonResult(
+private suspend fun parseJsonResult(
     input: String,
 ): Pair<JsonNode?, JsonError?> = withContext(Dispatchers.Default) {
     try {
