@@ -4,13 +4,35 @@ JsonCMP ships with five built-in color themes and supports custom themes via `Js
 
 ## Built-in Themes
 
-| Theme | Constant | Style |
-|-------|----------|-------|
-| VS Code Dark+ | `JsonTheme.Dark` | Dark background, blue keys, orange strings |
-| VS Code Light+ | `JsonTheme.Light` | White background, blue keys, red strings |
-| Monokai | `JsonTheme.Monokai` | Dark green background, pink keys, yellow strings |
-| Dracula | `JsonTheme.Dracula` | Dark purple background, cyan keys, yellow strings |
-| Solarized Dark | `JsonTheme.SolarizedDark` | Dark blue-green background, blue keys, teal strings |
+=== "Dark"
+
+    ![Dark Theme](../screenshots/viewer/theme/dark.png){ width="350" }
+
+    `JsonTheme.Dark` — Dark background, blue keys, orange strings (VS Code Dark+)
+
+=== "Light"
+
+    ![Light Theme](../screenshots/viewer/theme/light.png){ width="350" }
+
+    `JsonTheme.Light` — White background, blue keys, red strings (VS Code Light+)
+
+=== "Monokai"
+
+    ![Monokai Theme](../screenshots/viewer/theme/monokai.png){ width="350" }
+
+    `JsonTheme.Monokai` — Dark green background, pink keys, yellow strings
+
+=== "Dracula"
+
+    ![Dracula Theme](../screenshots/viewer/theme/dracula.png){ width="350" }
+
+    `JsonTheme.Dracula` — Dark purple background, cyan keys, yellow strings
+
+=== "Solarized Dark"
+
+    ![Solarized Dark Theme](../screenshots/viewer/theme/solarized.png){ width="350" }
+
+    `JsonTheme.SolarizedDark` — Dark blue-green background, blue keys, teal strings
 
 ## Usage
 

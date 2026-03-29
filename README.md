@@ -18,6 +18,12 @@ Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, 
 - **Multiple Themes** — Dark, Light, Monokai, Dracula, Solarized Dark (+ custom themes)
 - **KMP** — Android, iOS, and JVM Desktop support via Compose Multiplatform
 
+<p align="center">
+  <img src="docs/screenshots/viewer/viewer-hero.png" width="320" alt="JSON Viewer"/>
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/editor/editor-hero.png" width="320" alt="JSON Editor"/>
+</p>
+
 ## Installation
 
 Add `mavenCentral()` to your repositories in `settings.gradle.kts`:
@@ -81,6 +87,10 @@ fun MyEditor() {
 ```
 
 ## Themes
+
+| Dark | Light | Monokai | Dracula | Solarized Dark |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/viewer/theme/dark.png" width="150" alt="Dark"/> | <img src="docs/screenshots/viewer/theme/light.png" width="150" alt="Light"/> | <img src="docs/screenshots/viewer/theme/monokai.png" width="150" alt="Monokai"/> | <img src="docs/screenshots/viewer/theme/dracula.png" width="150" alt="Dracula"/> | <img src="docs/screenshots/viewer/theme/solarized.png" width="150" alt="Solarized Dark"/> |
 
 ```kotlin
 JsonViewerCMP(

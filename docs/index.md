@@ -15,6 +15,11 @@ Kotlin Multiplatform Compose JSON viewer and editor component. Two separate comp
 
 ## JSON Viewer
 
+<figure markdown="span">
+  ![JSON Viewer](screenshots/viewer/viewer-hero.png){ width="350" }
+  <figcaption>Syntax-highlighted viewer with code folding and line numbers</figcaption>
+</figure>
+
 Drop-in read-only JSON renderer with virtualized rendering:
 
 - Syntax highlighting (keys, strings, numbers, booleans, null, punctuation)
@@ -37,6 +42,11 @@ fun MyScreen() {
 ```
 
 ## JSON Editor
+
+<figure markdown="span">
+  ![JSON Editor](screenshots/editor/editor-hero.png){ width="350" }
+  <figcaption>Editable JSON with toolbar and real-time validation</figcaption>
+</figure>
 
 Full editing mode with real-time validation:
 
