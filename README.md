@@ -6,6 +6,10 @@
 
 [![Build](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml/badge.svg)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Coverage](https://img.shields.io/badge/coverage-0%25-red)](https://github.com/skymansandy/jsonCMP/actions/workflows/deploy.yml) [![Maven Central](https://img.shields.io/badge/maven--central-1.0.0--RC2-blue)](https://central.sonatype.com/artifact/dev.skymansandy/json-cmp)
 
+<p align="center">
+  <img src="docs/hero.png" alt="JsonCMP — JSON Viewer/Editor for Compose Multiplatform"/>
+</p>
+
 Kotlin Multiplatform Compose JSON viewer and editor component for Android, iOS, and JVM Desktop.
 
 > **⚠️ Experimental:** This library is in an experimental state. APIs may change without notice between releases. Use in production at your own discretion.

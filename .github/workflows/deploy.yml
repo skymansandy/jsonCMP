@@ -130,6 +130,7 @@ jobs:
   publish:
     name: Publish to Maven Central
     needs: test-and-coverage
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore:') }}
     runs-on: macos-latest
     environment: default
     steps:
