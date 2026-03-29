@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 import dev.skymansandy.jsoncmp.domain.line.JsonPart
 
 /** CompositionLocal providing the current [JsonCmpColors] palette. */
-val LocalJsonCmpColors = compositionLocalOf { JsonCmpColors.Dark }
+internal val LocalJsonCmpColors = compositionLocalOf { JsonCmpColors.Dark }
 
 /** Full color palette for JSON syntax, gutter, search highlights, and errors. */
 data class JsonCmpColors(

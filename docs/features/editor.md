@@ -1,21 +1,23 @@
 # JSON Editor
 
-The editor adds inline text editing with real-time validation, formatting, and sorting on top of the viewer.
+`JsonEditorCMP` provides inline text editing with real-time validation, formatting, and sorting. It has a 50 KB size limit for JSON content.
 
-## Enabling Editor Mode
-
-```kotlin
-val state = rememberJsonEditorState(
-    initialJson = myJson,
-    isEditing = true,
-)
-```
-
-Or toggle at runtime:
+## Usage
 
 ```kotlin
-state.isEditing = true
+@OptIn(ExperimentalJsonCmpApi::class)
+@Composable
+fun MyEditor() {
+    val state = rememberJsonEditorState(initialJson = myJson)
+
+    JsonEditorCMP(
+        modifier = Modifier.fillMaxSize(),
+        state = state,
+    )
+}
 ```
+
+`initialJson` is used only once to seed the editor. The editor owns its own text state internally. To load entirely new content, wrap the composable in a `key(documentId)` block.
 
 ## Toolbar
 
@@ -34,33 +36,15 @@ When the JSON is invalid, an error banner appears below the toolbar showing:
 
 ## Real-time Validation
 
-The `onJsonChange` callback fires on every edit with the current JSON string, parsed `JsonNode?` (null if invalid), and `JsonError?`:
+Observe changes reactively via Compose state properties on `JsonEditorState`:
 
 ```kotlin
-JsonCMP(
-    state = state,
-    onJsonChange = { json, parsed, error ->
-        if (error != null) {
-            showError(error.message)
-        } else {
-            saveJson(json)
-        }
-    },
-)
+val state = rememberJsonEditorState(initialJson = myJson)
+
+// In composition or via snapshotFlow
+state.json       // current raw JSON text
+state.parsedJson // parsed JsonNode?, null if invalid
+state.error      // JsonError?, null if valid
 ```
 
-## Formatting
-
-```kotlin
-state.format(compact = false) // Pretty-print with indentation
-state.format(compact = true)  // Minified single-line output
-```
-
-## Sorting
-
-Sort all object keys recursively:
-
-```kotlin
-state.sortKeys(ascending = true)  // A → Z
-state.sortKeys(ascending = false) // Z → A
-```
+No callbacks needed — the state properties update automatically as the user edits.

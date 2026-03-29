@@ -1,6 +1,6 @@
 # JSON Viewer
 
-The viewer renders JSON as a read-only, syntax-highlighted tree with line numbers and code folding.
+`JsonViewerCMP` renders JSON as a read-only, syntax-highlighted tree with line numbers, code folding, and virtualized rendering.
 
 ## Syntax Highlighting
 
@@ -17,12 +17,6 @@ Each JSON token type is rendered in a distinct color:
 
 Objects and arrays can be collapsed by clicking the fold indicator in the gutter. Collapsed sections show an ellipsis with the element count.
 
-```kotlin
-// Programmatic control
-state.collapseAll()
-state.expandAll()
-```
-
 ## Line Numbers
 
 Line numbers are displayed in a gutter column with a subtle border separator.
@@ -32,11 +26,23 @@ Line numbers are displayed in a gutter column with a subtle border separator.
 Pass a `searchQuery` to highlight matching text across the document:
 
 ```kotlin
-JsonCMP(
+JsonViewerCMP(
     state = state,
     searchQuery = "John",
-    colors = JsonCmpColors.Dark,
+    theme = JsonTheme.Dark,
 )
 ```
 
 Matches are highlighted with the `highlight` and `highlightFg` colors from the active theme.
+
+## Reactive State
+
+The viewer responds to changes in the `json` parameter passed to `rememberJsonViewerState` — new values trigger a re-parse and update the display:
+
+```kotlin
+var json by remember { mutableStateOf(initialJson) }
+val state = rememberJsonViewerState(json = json)
+
+// Updating `json` will automatically re-render the viewer
+json = newJson
+```

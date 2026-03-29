@@ -1,6 +1,6 @@
 # JsonCMP
 
-Kotlin Multiplatform Compose JSON viewer and editor component. Syntax-highlighted JSON rendering with code folding, inline editing, real-time validation, formatting, sorting, and search highlighting. Ships as a single Composable for Android, iOS, and JVM Desktop.
+Kotlin Multiplatform Compose JSON viewer and editor component. Two separate composables — `JsonViewerCMP` for read-only rendering and `JsonEditorCMP` for editing — with syntax highlighting, code folding, real-time validation, formatting, sorting, and search highlighting. Ships for Android, iOS, and JVM Desktop.
 
 !!! warning "Experimental"
     This library is in an experimental state. APIs may change without notice between releases. Use in production at your own discretion.
@@ -15,20 +15,20 @@ Kotlin Multiplatform Compose JSON viewer and editor component. Syntax-highlighte
 
 ## JSON Viewer
 
-Drop-in read-only JSON renderer with:
+Drop-in read-only JSON renderer with virtualized rendering:
 
 - Syntax highlighting (keys, strings, numbers, booleans, null, punctuation)
 - Line numbers with gutter
 - Code folding for objects and arrays
 - Search text highlighting
-- Collapse/expand all
 
 ```kotlin
+@OptIn(ExperimentalJsonCmpApi::class)
 @Composable
 fun MyScreen() {
-    val state = rememberJsonEditorState(initialJson = myJson)
+    val state = rememberJsonViewerState(json = myJson)
 
-    JsonCMP(
+    JsonViewerCMP(
         modifier = Modifier.fillMaxSize(),
         state = state,
         searchQuery = "name",
@@ -42,25 +42,22 @@ Full editing mode with real-time validation:
 
 - Inline text editing with live parse feedback
 - Error banner showing parse errors with line/column position
-- Format (pretty-print or minify)
-- Sort keys ascending/descending
 - Toolbar with format, sort, collapse/expand controls
+- 50 KB size limit for JSON content
 
 ```kotlin
+@OptIn(ExperimentalJsonCmpApi::class)
 @Composable
 fun MyEditor() {
-    val state = rememberJsonEditorState(
-        initialJson = myJson,
-        isEditing = true,
-    )
+    val state = rememberJsonEditorState(initialJson = myJson)
 
-    JsonCMP(
+    JsonEditorCMP(
         modifier = Modifier.fillMaxSize(),
         state = state,
-        onJsonChange = { json, parsed, error ->
-            // Handle changes
-        },
     )
+
+    // Observe state reactively
+    // state.json, state.parsedJson, state.error
 }
 ```
 
@@ -68,12 +65,12 @@ fun MyEditor() {
 
 Five built-in color themes inspired by popular code editors:
 
-| Theme | Style |
-|-------|-------|
-| `JsonCmpColors.Dark` | VS Code Dark+ (default) |
-| `JsonCmpColors.Light` | VS Code Light+ |
-| `JsonCmpColors.Monokai` | Monokai |
-| `JsonCmpColors.Dracula` | Dracula |
-| `JsonCmpColors.SolarizedDark` | Solarized Dark |
+| Theme | Constant | Style |
+|-------|----------|-------|
+| VS Code Dark+ | `JsonTheme.Dark` | Dark background, blue keys, orange strings |
+| VS Code Light+ | `JsonTheme.Light` | White background, blue keys, red strings |
+| Monokai | `JsonTheme.Monokai` | Dark green background, pink keys, yellow strings |
+| Dracula | `JsonTheme.Dracula` | Dark purple background, cyan keys, yellow strings |
+| Solarized Dark | `JsonTheme.SolarizedDark` | Dark blue-green background, blue keys, teal strings |
 
-Custom themes are supported by creating your own `JsonCmpColors` instance.
+Custom themes are supported via `JsonTheme.Custom(yourColors)`.

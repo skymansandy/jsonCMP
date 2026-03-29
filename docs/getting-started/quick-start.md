@@ -1,79 +1,74 @@
 # Quick Start
 
-## Viewer Mode
+## JSON Viewer
 
 Render JSON as a read-only, syntax-highlighted, foldable tree:
 
 ```kotlin
+@OptIn(ExperimentalJsonCmpApi::class)
 @Composable
 fun JsonViewerScreen() {
-    val state = rememberJsonEditorState(
-        initialJson = """{"name": "John", "age": 30}""",
+    val state = rememberJsonViewerState(
+        json = """{"name": "John", "age": 30}""",
     )
 
-    JsonCMP(
+    JsonViewerCMP(
         modifier = Modifier.fillMaxSize(),
         state = state,
     )
 }
 ```
 
-## Editor Mode
+The viewer responds to changes in the `json` parameter — passing a new value triggers a re-parse and updates the display.
 
-Enable inline editing with real-time validation:
+## JSON Editor
+
+Edit JSON with real-time validation, formatting, and sorting:
 
 ```kotlin
+@OptIn(ExperimentalJsonCmpApi::class)
 @Composable
 fun JsonEditorScreen() {
     val state = rememberJsonEditorState(
         initialJson = """{"name": "John", "age": 30}""",
-        isEditing = true,
     )
 
-    JsonCMP(
+    JsonEditorCMP(
         modifier = Modifier.fillMaxSize(),
         state = state,
-        onJsonChange = { json, parsed, error ->
-            if (error != null) {
-                println("Parse error: ${error.message}")
-            }
-        },
     )
+
+    // React to changes by observing state properties
+    LaunchedEffect(state.error) {
+        state.error?.let { error ->
+            println("Parse error: ${error.message}")
+        }
+    }
 }
 ```
+
+The editor owns its own text state — `initialJson` is used only once to seed the content. To load entirely new content, wrap the composable in a `key(documentId)` block.
 
 ## Search Highlighting
 
 Pass a search query to highlight matching text:
 
 ```kotlin
-JsonCMP(
+JsonViewerCMP(
     state = state,
     searchQuery = "John",
 )
 ```
 
-## Programmatic Control
+## Observing State
 
-Use `JsonEditorState` to control the component:
+Both `JsonViewerState` and `JsonEditorState` expose observable Compose state properties:
 
 ```kotlin
-val state = rememberJsonEditorState(initialJson = myJson)
+val state = rememberJsonViewerState(json = myJson)
 
-// Format
-state.format(compact = false) // pretty-print
-state.format(compact = true)  // minify
-
-// Sort
-state.sortKeys(ascending = true)
-
-// Folding
-state.collapseAll()
-state.expandAll()
-
-// Update content
-state.updateRawJson(newJson)
-
-// Toggle mode
-state.isEditing = true
+// Read in composition or via snapshotFlow
+state.json       // current raw JSON text
+state.parsedJson // parsed JsonNode tree, or null if invalid
+state.error      // parse error, or null if valid
 ```

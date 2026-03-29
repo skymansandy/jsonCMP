@@ -1,32 +1,37 @@
 # Themes
 
-JsonCMP ships with five built-in color themes and supports custom themes.
+JsonCMP ships with five built-in color themes and supports custom themes via `JsonTheme`.
 
 ## Built-in Themes
 
 | Theme | Constant | Style |
 |-------|----------|-------|
-| VS Code Dark+ | `JsonCmpColors.Dark` | Dark background, blue keys, orange strings |
-| VS Code Light+ | `JsonCmpColors.Light` | White background, blue keys, red strings |
-| Monokai | `JsonCmpColors.Monokai` | Dark green background, pink keys, yellow strings |
-| Dracula | `JsonCmpColors.Dracula` | Dark purple background, cyan keys, yellow strings |
-| Solarized Dark | `JsonCmpColors.SolarizedDark` | Dark blue-green background, blue keys, teal strings |
+| VS Code Dark+ | `JsonTheme.Dark` | Dark background, blue keys, orange strings |
+| VS Code Light+ | `JsonTheme.Light` | White background, blue keys, red strings |
+| Monokai | `JsonTheme.Monokai` | Dark green background, pink keys, yellow strings |
+| Dracula | `JsonTheme.Dracula` | Dark purple background, cyan keys, yellow strings |
+| Solarized Dark | `JsonTheme.SolarizedDark` | Dark blue-green background, blue keys, teal strings |
 
 ## Usage
 
 ```kotlin
-JsonCMP(
+JsonViewerCMP(
     state = state,
-    colors = JsonCmpColors.Dracula,
+    theme = JsonTheme.Dracula,
+)
+
+JsonEditorCMP(
+    state = editorState,
+    theme = JsonTheme.Monokai,
 )
 ```
 
 ## Custom Themes
 
-Create a custom `JsonCmpColors` instance:
+Create a custom theme by wrapping a `JsonCmpColors` instance in `JsonTheme.Custom`:
 
 ```kotlin
-val myTheme = JsonCmpColors(
+val myColors = JsonCmpColors(
     key = Color(0xFF9CDCFE),
     string = Color(0xFFCE9178),
     number = Color(0xFFB5CEA8),
@@ -45,8 +50,8 @@ val myTheme = JsonCmpColors(
     errorForeground = Color(0xFFFF6B6B),
 )
 
-JsonCMP(
+JsonEditorCMP(
     state = state,
-    colors = myTheme,
+    theme = JsonTheme.Custom(myColors),
 )
 ```

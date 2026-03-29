@@ -1,8 +1,32 @@
-# JsonCmpColors
+# JsonTheme & JsonCmpColors
+
+## JsonTheme
+
+Sealed class wrapping a `JsonCmpColors` palette with a display label. Passed as the `theme` parameter to `JsonViewerCMP` and `JsonEditorCMP`.
+
+### Built-in Themes
+
+```kotlin
+JsonTheme.Dark           // VS Code Dark+
+JsonTheme.Light          // VS Code Light+
+JsonTheme.Monokai        // Monokai
+JsonTheme.Dracula        // Dracula
+JsonTheme.SolarizedDark  // Solarized Dark
+```
+
+### Custom Theme
+
+```kotlin
+JsonTheme.Custom(myJsonCmpColors)
+```
+
+---
+
+## JsonCmpColors
 
 Data class defining the color scheme for all JSON elements and UI chrome.
 
-## Properties
+### Properties
 
 | Property | Description |
 |----------|-------------|
@@ -23,7 +47,7 @@ Data class defining the color scheme for all JSON elements and UI chrome.
 | `errorBackground` | Error banner background |
 | `errorForeground` | Error banner text |
 
-## Built-in Presets
+### Built-in Presets
 
 ```kotlin
 JsonCmpColors.Dark           // VS Code Dark+
