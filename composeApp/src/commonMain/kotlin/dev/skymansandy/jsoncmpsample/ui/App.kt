@@ -8,139 +8,185 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.skymansandy.jsoncmp.JsonCMP
-import dev.skymansandy.jsoncmp.config.JsonAction
+import dev.skymansandy.jsoncmp.JsonEditorCMP
+import dev.skymansandy.jsoncmp.JsonViewerCMP
 import dev.skymansandy.jsoncmp.config.JsonTheme
-import dev.skymansandy.jsoncmp.config.rememberJsonStore
+import dev.skymansandy.jsoncmp.helper.annotation.ExperimentalJsonCmpApi
+import dev.skymansandy.jsoncmpsample.data.sampleJson
 import jsoncmp.composeapp.generated.resources.Res
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class, ExperimentalJsonCmpApi::class)
 @Composable
 fun App() {
     MaterialTheme(
         colorScheme = darkColorScheme(),
     ) {
+        var fiveMbJson by remember { mutableStateOf("") }
+        var showInvalidJson by remember { mutableStateOf(false) }
+        var searchQuery by remember { mutableStateOf("") }
+        var selectedTheme by remember { mutableStateOf<JsonTheme>(JsonTheme.Dark) }
+        var showOverflowMenu by remember { mutableStateOf(false) }
+        var selectedTab by remember { mutableIntStateOf(0) }
+        var searchExpanded by remember { mutableStateOf(false) }
+
+        val themes = remember {
+            listOf(
+                JsonTheme.Dark,
+                JsonTheme.Light,
+                JsonTheme.Monokai,
+                JsonTheme.Dracula,
+                JsonTheme.SolarizedDark,
+            )
+        }
+
+        LaunchedEffect(Unit) {
+            withContext(Dispatchers.Default) {
+                val bytes = Res.readBytes("files/5mbjson.json")
+                fiveMbJson = bytes.decodeToString()
+            }
+        }
+
+        val viewerJson = if (showInvalidJson) "$fiveMbJson!!!" else fiveMbJson
+
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
-                        Text("JsonCMP Sample")
+                        if (searchExpanded && selectedTab == 0) {
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                modifier = Modifier.fillMaxWidth(),
+                                placeholder = { Text("Search JSON...") },
+                                singleLine = true,
+                                trailingIcon = {
+                                    IconButton(onClick = {
+                                        searchQuery = ""
+                                        searchExpanded = false
+                                    }) {
+                                        Icon(Icons.Default.Close, contentDescription = "Close search")
+                                    }
+                                },
+                            )
+                        } else {
+                            Text("JsonCMP Sample")
+                        }
+                    },
+                    actions = {
+                        if (!searchExpanded && selectedTab == 0) {
+                            IconButton(onClick = { searchExpanded = true }) {
+                                Icon(Icons.Default.Search, contentDescription = "Search")
+                            }
+                        }
+                        IconButton(onClick = { showInvalidJson = !showInvalidJson }) {
+                            Icon(
+                                imageVector = if (showInvalidJson) Icons.Default.BugReport else Icons.Default.CheckCircle,
+                                contentDescription = if (showInvalidJson) "Showing invalid JSON" else "Showing valid JSON",
+                            )
+                        }
+                        IconButton(onClick = { showOverflowMenu = !showOverflowMenu }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        }
+                        DropdownMenu(
+                            expanded = showOverflowMenu,
+                            onDismissRequest = { showOverflowMenu = false },
+                        ) {
+                            Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                                Row(
+                                    modifier = Modifier
+                                        .horizontalScroll(rememberScrollState()),
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    themes.forEach { theme ->
+                                        FilterChip(
+                                            selected = selectedTheme == theme,
+                                            onClick = { selectedTheme = theme },
+                                            label = { Text(theme.label) },
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     },
                 )
             },
-        ) {
-            var searchQuery by remember { mutableStateOf("") }
-            var selectedTheme by remember { mutableStateOf<JsonTheme>(JsonTheme.Dark) }
-            val themes = remember {
-                listOf(
-                    JsonTheme.Dark,
-                    JsonTheme.Light,
-                    JsonTheme.Monokai,
-                    JsonTheme.Dracula,
-                    JsonTheme.SolarizedDark,
-                )
-            }
-
-            var largeJson by remember { mutableStateOf("") }
-            LaunchedEffect(Unit) {
-                withContext(Dispatchers.Default) {
-                    do {
-                        val bytes2 = Res.readBytes("files/128kb.json")
-                        largeJson = bytes2.decodeToString()
-                        delay(3.seconds)
-                        val bytes = Res.readBytes("files/5mb.json")
-                        largeJson = bytes.decodeToString()
-                        delay(3.seconds)
-                    } while (false)
-                }
-            }
-
-            val store = rememberJsonStore(
-                initialJson = largeJson,
-                isEditing = false,
-            )
-            val state by store.state.collectAsState()
-
+        ) { padding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(it),
+                    .padding(padding),
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    themes.forEach { theme ->
-                        FilterChip(
-                            selected = selectedTheme == theme,
-                            onClick = { selectedTheme = theme },
-                            label = { Text(theme.label) },
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier.weight(1f),
-                        label = { Text("Search") },
-                        singleLine = true,
+                TabRow(selectedTabIndex = selectedTab) {
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0 },
+                        text = {
+                            Text(
+                                if (showInvalidJson) "Viewer: Invalid JSON"
+                                else "Viewer: Valid 5MB JSON",
+                            )
+                        },
                     )
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Switch(
-                            checked = state.isEditing,
-                            onCheckedChange = { store.dispatch(JsonAction.SetEditing(it)) },
-                        )
-                        Text(
-                            text = if (state.isEditing) "Edit" else "View",
-                            style = typography.labelSmall,
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
+                        text = {
+                            Text(
+                                if (showInvalidJson) "Editor: Large JSON (50KB limit)"
+                                else "Editor: Sample JSON",
+                            )
+                        },
+                    )
+                }
+
+                when (selectedTab) {
+                    0 -> JsonViewerCMP(
+                        json = viewerJson,
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        searchQuery = searchQuery,
+                        theme = selectedTheme,
+                    )
+                    1 -> {
+                        val editorJson = if (showInvalidJson) fiveMbJson else sampleJson
+                        JsonEditorCMP(
+                            json = editorJson,
+                            modifier = Modifier.fillMaxWidth().weight(1f),
+                            searchQuery = searchQuery,
+                            theme = selectedTheme,
                         )
                     }
                 }
-
-                JsonCMP(
-                    modifier = Modifier.fillMaxWidth(),
-                    store = store,
-                    searchQuery = searchQuery,
-                    theme = selectedTheme,
-                )
             }
         }
     }

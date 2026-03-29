@@ -25,6 +25,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,7 +48,10 @@ internal fun JsonEditor(
     var lastStateRaw by remember { mutableStateOf(state.raw) }
 
     if (state.raw != lastStateRaw) {
-        textFieldValue = TextFieldValue(state.raw)
+        textFieldValue = textFieldValue.copy(
+            text = state.raw,
+            selection = textFieldValue.selection.constrain(state.raw.length),
+        )
         lastStateRaw = state.raw
     }
 
@@ -127,6 +131,12 @@ internal fun JsonEditor(
             }
         }
     }
+}
+
+private fun TextRange.constrain(maxLength: Int): TextRange {
+    val newStart = start.coerceIn(0, maxLength)
+    val newEnd = end.coerceIn(0, maxLength)
+    return if (newStart == start && newEnd == end) this else TextRange(newStart, newEnd)
 }
 
 // ── Previews ──
