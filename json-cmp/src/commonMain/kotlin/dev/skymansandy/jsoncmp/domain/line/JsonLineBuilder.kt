@@ -23,6 +23,9 @@ internal class JsonLineBuilder {
     private var lineNum = 0
     private var nextFoldId = 0
 
+    /** Pre-computed indent parts to avoid repeated string allocation. */
+    private val indentCache = ArrayList<List<JsonPart>>()
+
     /**
      * Tracks the index in [out] where each foldable header line was emitted.
      * After the full tree walk, a post-pass uses these to compute [JsonLine.childEndIndex]
@@ -77,9 +80,8 @@ internal class JsonLineBuilder {
         parentFoldIds: List<Int>,
         path: JsonPath,
     ) {
-        // Common parts shared by all node types
-        val indent: List<JsonPart> =
-            if (depth > 0) listOf(JsonPart.Indent("  ".repeat(depth))) else emptyList()
+        // Common parts shared by all node types — indent is cached to avoid repeated allocation
+        val indent: List<JsonPart> = indentForDepth(depth)
         val keyParts: List<JsonPart> = if (key != null) {
             listOf(JsonPart.Key("\"$key\""), JsonPart.Punct(": "))
         } else emptyList()
@@ -189,6 +191,15 @@ internal class JsonLineBuilder {
                     null, null, parentFoldIds, path = path,
                 )
         }
+    }
+
+    private fun indentForDepth(depth: Int): List<JsonPart> {
+        if (depth == 0) return emptyList()
+        // Grow cache on demand
+        while (indentCache.size < depth) {
+            indentCache.add(listOf(JsonPart.Indent("  ".repeat(indentCache.size + 1))))
+        }
+        return indentCache[depth - 1]
     }
 }
 

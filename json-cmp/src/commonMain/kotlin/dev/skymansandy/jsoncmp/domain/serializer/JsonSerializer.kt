@@ -14,7 +14,8 @@ import dev.skymansandy.jsoncmp.domain.model.JsonNode
  */
 internal fun JsonNode.toJsonString(indent: Int = 2, compact: Boolean = false): String {
     val sb = StringBuilder()
-    writeNode(sb = sb, node = this, currentIndent = 0, step = indent, compact = compact)
+    val indentCache = HashMap<Int, String>()
+    writeNode(sb = sb, node = this, currentIndent = 0, step = indent, compact = compact, indentCache = indentCache)
     return sb.toString()
 }
 
@@ -59,11 +60,12 @@ private fun writeNode(
     currentIndent: Int,
     step: Int,
     compact: Boolean,
+    indentCache: MutableMap<Int, String>,
 ) {
     val nl = if (compact) "" else "\n"
     val childIndent = currentIndent + step
-    val indentStr = if (compact) "" else " ".repeat(childIndent)
-    val closingIndentStr = if (compact) "" else " ".repeat(currentIndent)
+    val indentStr = if (compact) "" else indentCache.getOrPut(childIndent) { " ".repeat(childIndent) }
+    val closingIndentStr = if (compact) "" else indentCache.getOrPut(currentIndent) { " ".repeat(currentIndent) }
     val colonSep = if (compact) ":" else ": "
 
     when (node) {
@@ -74,9 +76,11 @@ private fun writeNode(
                 sb.append("{").append(nl)
                 node.fields.forEachIndexed { i, (key, value) ->
                     sb.append(indentStr)
-                    sb.append('"').append(escapeJsonString(key)).append('"')
+                    sb.append('"')
+                    escapeJsonStringTo(sb, key)
+                    sb.append('"')
                     sb.append(colonSep)
-                    writeNode(sb, value, childIndent, step, compact)
+                    writeNode(sb, value, childIndent, step, compact, indentCache)
                     if (i < node.fields.lastIndex) sb.append(",")
                     sb.append(nl)
                 }
@@ -91,7 +95,7 @@ private fun writeNode(
                 sb.append("[").append(nl)
                 node.elements.forEachIndexed { i, element ->
                     sb.append(indentStr)
-                    writeNode(sb, element, childIndent, step, compact)
+                    writeNode(sb, element, childIndent, step, compact, indentCache)
                     if (i < node.elements.lastIndex) sb.append(",")
                     sb.append(nl)
                 }
@@ -100,7 +104,9 @@ private fun writeNode(
         }
 
         is JsonNode.JString -> {
-            sb.append('"').append(escapeJsonString(node.value)).append('"')
+            sb.append('"')
+            escapeJsonStringTo(sb, node.value)
+            sb.append('"')
         }
 
         is JsonNode.JNumber -> sb.append(node.value)
@@ -109,22 +115,22 @@ private fun writeNode(
     }
 }
 
-/** Escapes special characters (quotes, backslashes, control chars) for safe JSON string output. */
-private fun escapeJsonString(s: String): String = buildString(s.length) {
+/** Escapes special characters directly into [sb], avoiding intermediate string allocation. */
+private fun escapeJsonStringTo(sb: StringBuilder, s: String) {
     for (c in s) {
         when (c) {
-            '"' -> append("\\\"")
-            '\\' -> append("\\\\")
-            '\n' -> append("\\n")
-            '\r' -> append("\\r")
-            '\t' -> append("\\t")
-            '\b' -> append("\\b")
-            '\u000C' -> append("\\f")
+            '"' -> sb.append("\\\"")
+            '\\' -> sb.append("\\\\")
+            '\n' -> sb.append("\\n")
+            '\r' -> sb.append("\\r")
+            '\t' -> sb.append("\\t")
+            '\b' -> sb.append("\\b")
+            '\u000C' -> sb.append("\\f")
             else -> {
                 if (c.code < 0x20) {
-                    append("\\u${c.code.toString(16).padStart(4, '0')}")
+                    sb.append("\\u${c.code.toString(16).padStart(4, '0')}")
                 } else {
-                    append(c)
+                    sb.append(c)
                 }
             }
         }

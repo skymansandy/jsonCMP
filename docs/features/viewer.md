@@ -9,8 +9,7 @@
 
 ## Size Limits
 
-- **Valid JSON** — Virtually no size limit. The viewer uses virtualized rendering to handle large documents efficiently.
-- **Invalid JSON** — Truncated at 100 KB. A warning is shown indicating the original size and that the preview is truncated.
+- Virtually no size limit. The viewer uses virtualized rendering to handle large documents efficiently.
 
 ## Syntax Highlighting
 

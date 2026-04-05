@@ -75,9 +75,12 @@ internal class JsonHolderImpl(
             }
 
             is JsonAction.CollapseAll -> {
-                _state.update { current ->
-                    val allFoldIds = current.allLines.mapNotNull { it.foldId }
-                    current.copy(foldState = allFoldIds.associateWith { true })
+                scope.launch {
+                    val current = _state.value
+                    val collapsedFolds = current.allLines
+                        .mapNotNull { it.foldId }
+                        .associateWith { true }
+                    _state.update { it.copy(foldState = collapsedFolds) }
                 }
             }
 

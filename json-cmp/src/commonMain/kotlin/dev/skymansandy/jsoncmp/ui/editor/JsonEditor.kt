@@ -49,6 +49,7 @@ import dev.skymansandy.jsoncmp.ui.editor.component.EditorToolbar
 import dev.skymansandy.jsoncmp.ui.editor.component.ErrorBanner
 import dev.skymansandy.jsoncmp.ui.editor.component.LineGutterEditMode
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 /** Internal JSON editor with syntax-highlighted BasicTextField and line gutter. */
@@ -79,11 +80,14 @@ internal fun JsonEditor(
 
     val focusRequester = remember { FocusRequester() }
 
-    // Syntax highlighting runs off the main thread to avoid jank on large inputs
+    // Syntax highlighting runs off the main thread to avoid jank on large inputs.
+    // Short debounce avoids redundant work during fast typing; stale results are
+    // discarded via the text-length guard below.
     val highlighted by produceState(
         initialValue = AnnotatedString(textFieldValue.text),
         textFieldValue.text, searchQuery, colors,
     ) {
+        delay(HIGHLIGHT_DEBOUNCE_MS)
         value = withContext(Dispatchers.Default) {
             highlightJson(
                 text = textFieldValue.text,
@@ -91,6 +95,14 @@ internal fun JsonEditor(
                 colors = colors,
             )
         }
+    }
+
+    // Guard: if highlighting is stale (from previous text), fall back to plain text
+    // so BasicTextField never receives a mismatched AnnotatedString.
+    val safeHighlighted = if (highlighted.text == textFieldValue.text) {
+        highlighted
+    } else {
+        AnnotatedString(textFieldValue.text)
     }
 
     Column(
@@ -137,7 +149,7 @@ internal fun JsonEditor(
 
                 // JSON editor
                 BasicTextField(
-                    value = textFieldValue.copy(annotatedString = highlighted),
+                    value = textFieldValue.copy(annotatedString = safeHighlighted),
                     onValueChange = { newValue ->
                         textFieldValue = newValue
                         onAction(JsonAction.UpdateJson(newValue.text))
@@ -155,6 +167,8 @@ internal fun JsonEditor(
         }
     }
 }
+
+private const val HIGHLIGHT_DEBOUNCE_MS = 100L
 
 private fun TextRange.constrain(maxLength: Int): TextRange {
     val newStart = start.coerceIn(0, maxLength)

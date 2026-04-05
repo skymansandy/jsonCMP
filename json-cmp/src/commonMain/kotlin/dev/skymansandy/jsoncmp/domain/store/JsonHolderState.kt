@@ -47,22 +47,25 @@ internal class JsonHolderState(
 
     fun computeFoldedContent(line: JsonLine): String {
         if (line.foldId == null || line.childEndIndex < 0) return ""
-        val startIdx = allLines.indexOf(line)
-        if (startIdx < 0) return ""
+        val startIdx = line.lineNumber - 1
+        if (startIdx < 0 || startIdx >= allLines.size) return ""
         val endIdx = line.childEndIndex.coerceAtMost(allLines.size)
-        return allLines.subList(startIdx + 1, endIdx)
-            .joinToString(" ") { l -> l.parts.joinToString("") { it.text }.trim() }
+        return buildString {
+            for (i in (startIdx + 1) until endIdx) {
+                if (isNotEmpty()) append(' ')
+                append(allLines[i].text.trim())
+            }
+        }
     }
 
     fun hasFoldedMatch(line: JsonLine, searchQuery: String): Boolean {
         if (line.foldId == null || line.childEndIndex < 0 || searchQuery.isBlank()) return false
-        val startIdx = allLines.indexOf(line)
-        if (startIdx < 0) return false
+        val startIdx = line.lineNumber - 1
+        if (startIdx < 0 || startIdx >= allLines.size) return false
         val endIdx = line.childEndIndex.coerceAtMost(allLines.size)
         val queryLower = searchQuery.lowercase()
         for (i in (startIdx + 1) until endIdx) {
-            val lineText = allLines[i].parts.joinToString("") { it.text }
-            if (lineText.lowercase().contains(queryLower)) return true
+            if (allLines[i].text.lowercase().contains(queryLower)) return true
         }
         return false
     }
@@ -70,13 +73,13 @@ internal class JsonHolderState(
     fun countFoldedMatches(line: JsonLine, searchQuery: String): Int {
         if (line.foldId == null || line.childEndIndex < 0 || searchQuery.isBlank()) return 0
         if (foldState[line.foldId] != true) return 0
-        val startIdx = allLines.indexOf(line)
-        if (startIdx < 0) return 0
+        val startIdx = line.lineNumber - 1
+        if (startIdx < 0 || startIdx >= allLines.size) return 0
         val endIdx = line.childEndIndex.coerceAtMost(allLines.size)
         val queryLower = searchQuery.lowercase()
         var count = 0
         for (i in (startIdx + 1) until endIdx) {
-            val lineText = allLines[i].parts.joinToString("") { it.text }.lowercase()
+            val lineText = allLines[i].text.lowercase()
             var idx = lineText.indexOf(queryLower)
             while (idx >= 0) {
                 count++
@@ -89,24 +92,25 @@ internal class JsonHolderState(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is JsonHolderState) return false
-        return raw == other.raw &&
-            parsedJson == other.parsedJson &&
-            error == other.error &&
-            isParsing == other.isParsing &&
+        return isParsing == other.isParsing &&
             isCompact == other.isCompact &&
             isEditing == other.isEditing &&
+            error == other.error &&
+            foldState == other.foldState &&
+            raw == other.raw &&
             allLines == other.allLines &&
-            foldState == other.foldState
+            parsedJson == other.parsedJson
     }
 
     override fun hashCode(): Int {
-        var result = raw.hashCode()
+        // Use raw.length instead of raw.hashCode() to avoid O(n) hash on large strings
+        var result = raw.length
         result = 31 * result + (parsedJson?.hashCode() ?: 0)
         result = 31 * result + (error?.hashCode() ?: 0)
         result = 31 * result + isParsing.hashCode()
         result = 31 * result + isCompact.hashCode()
         result = 31 * result + isEditing.hashCode()
-        result = 31 * result + allLines.hashCode()
+        result = 31 * result + allLines.size
         result = 31 * result + foldState.hashCode()
         return result
     }

@@ -73,7 +73,7 @@ internal fun JsonViewerContent(
             buildList {
                 visibleLines.forEachIndexed { lineIdx, line ->
                     // Find all occurrences in the visible text of this line
-                    val lineText = line.parts.joinToString("") { it.text }.lowercase()
+                    val lineText = line.text.lowercase()
                     var idx = lineText.indexOf(queryLower)
                     while (idx >= 0) {
                         add(SearchMatch(lineIdx = lineIdx, charOffset = idx))

@@ -4,6 +4,7 @@
 
 package dev.skymansandy.jsoncmp.domain.line
 
+import androidx.compose.runtime.Immutable
 import dev.skymansandy.jsoncmp.domain.model.FoldType
 import dev.skymansandy.jsoncmp.domain.model.JsonPath
 
@@ -24,6 +25,7 @@ import dev.skymansandy.jsoncmp.domain.model.JsonPath
  *   straight to `allLines[childEndIndex]` instead of iterating through every hidden child.
  *   Set to -1 for non-foldable lines (values, closing brackets).
  */
+@Immutable
 internal data class JsonLine(
     val lineNumber: Int,
     val depth: Int,
@@ -35,4 +37,7 @@ internal data class JsonLine(
     val path: JsonPath = emptyList(),
     val isClosingBracket: Boolean = false,
     val childEndIndex: Int = -1,
-)
+) {
+    /** Cached concatenation of all parts' text — avoids repeated joinToString in hot paths. */
+    val text: String = parts.joinToString("") { it.text }
+}

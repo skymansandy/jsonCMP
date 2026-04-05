@@ -143,6 +143,10 @@ internal fun JsonViewerLineList(
                 items(
                     items = visibleLines,
                     key = { it.lineNumber },
+                    contentType = { line ->
+                        val isFolded = line.foldId != null && foldState[line.foldId] == true
+                        if (isFolded) 1 else 0
+                    },
                 ) { line -> lineContent(line) }
             }
         }
