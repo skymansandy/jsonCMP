@@ -8,9 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import dev.skymansandy.jsoncmp.theme.LocalJsonCmpColors
 import dev.skymansandy.jsoncmp.theme.monoStyle
 
-/** Fallback text display for invalid/unparseable JSON with optional search highlighting. */
+/** Fallback text display for invalid/unparseable JSON with lazy line-based rendering and optional search highlighting. */
 @Composable
 internal fun PlainText(
     modifier: Modifier = Modifier,
@@ -31,41 +32,53 @@ internal fun PlainText(
     searchQuery: String,
 ) {
     val colors = LocalJsonCmpColors.current
-
-    val annotated = remember(text, searchQuery, colors) {
-        buildAnnotatedString {
-            append(text)
-            addStyle(SpanStyle(color = colors.punctuation), 0, text.length)
-            if (searchQuery.isNotBlank()) {
-                val lowerText = text.lowercase()
-                val lowerQuery = searchQuery.lowercase()
-                var idx = lowerText.indexOf(lowerQuery)
-                while (idx >= 0) {
-                    addStyle(
-                        SpanStyle(background = colors.highlight, color = colors.highlightFg),
-                        idx,
-                        idx + lowerQuery.length,
-                    )
-                    idx = lowerText.indexOf(lowerQuery, idx + lowerQuery.length)
-                }
-            }
-        }
-    }
+    val lines = remember(text) { text.split('\n') }
+    val horizontalScrollState = rememberScrollState()
 
     SelectionContainer(
         modifier = modifier
             .fillMaxWidth()
             .background(colors.background),
     ) {
-        Text(
-            text = annotated,
-            style = monoStyle,
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp, vertical = 4.dp),
-        )
+                .horizontalScroll(horizontalScrollState),
+        ) {
+            itemsIndexed(
+                items = lines,
+                key = { index, _ -> index },
+            ) { _, line ->
+                val annotated = remember(line, searchQuery, colors) {
+                    buildAnnotatedString {
+                        append(line)
+                        addStyle(SpanStyle(color = colors.punctuation), 0, line.length)
+                        if (searchQuery.isNotBlank()) {
+                            val lowerLine = line.lowercase()
+                            val lowerQuery = searchQuery.lowercase()
+                            var idx = lowerLine.indexOf(lowerQuery)
+                            while (idx >= 0) {
+                                addStyle(
+                                    SpanStyle(
+                                        background = colors.highlight,
+                                        color = colors.highlightFg,
+                                    ),
+                                    idx,
+                                    idx + lowerQuery.length,
+                                )
+                                idx = lowerLine.indexOf(lowerQuery, idx + lowerQuery.length)
+                            }
+                        }
+                    }
+                }
+
+                Text(
+                    text = annotated,
+                    style = monoStyle,
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                )
+            }
+        }
     }
 }
 

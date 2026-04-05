@@ -4,7 +4,7 @@ Two separate composable entry points for viewing and editing JSON.
 
 ## JsonViewerCMP
 
-Read-only JSON viewer with virtualized rendering. Virtually no size limit for valid JSON; invalid JSON is truncated at 100 KB with a warning.
+Read-only JSON viewer with virtualized rendering. Virtually no size limit.
 
 ```kotlin
 @ExperimentalJsonCmpApi

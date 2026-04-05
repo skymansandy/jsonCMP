@@ -34,40 +34,23 @@ internal suspend fun parseAndBuildLines(
     val trimmed = raw.trim()
     if (trimmed.isEmpty()) return@withContext ParseResult.Empty
 
-    val (node, err) = parseJsonResult(trimmed)
-    if (node != null) {
-        ParseResult.Success(node, buildDisplayLines(node))
-    } else {
-        ParseResult.Failure(err)
-    }
-}
-
-/** Parses [input] into a [JsonNode] tree, returning (node, null) on success or (null, error) on failure. */
-private suspend fun parseJsonResult(
-    input: String,
-): Pair<JsonNode?, JsonError?> = withContext(Dispatchers.Default) {
     try {
-        val trimmed = input.trim()
-        if (trimmed.isEmpty()) {
-            null to JsonError("Empty input")
-        } else {
-            val element = json.parseToJsonElement(trimmed)
-            element.toJsonNode() to null
-        }
+        val element = json.parseToJsonElement(trimmed)
+        val node = element.toJsonNode()
+        ParseResult.Success(node, buildDisplayLines(node))
     } catch (e: Exception) {
-        null to JsonError(e.message ?: "Invalid JSON")
+        ParseResult.Failure(JsonError(e.message ?: "Invalid JSON"))
     }
 }
 
-private suspend fun JsonElement.toJsonNode(): JsonNode = withContext(Dispatchers.Default) {
-    when (this@toJsonNode) {
-        is JsonObject -> JsonNode.JObject(entries.map { (key, value) -> key to value.toJsonNode() })
-        is JsonArray -> JsonNode.JArray(map { it.toJsonNode() })
-        JsonNull -> JsonNode.JNull
-        is JsonPrimitive -> when {
-            isString -> JsonNode.JString(content)
-            booleanOrNull != null -> JsonNode.JBoolean(boolean)
-            else -> JsonNode.JNumber(content)
-        }
+/** Converts a kotlinx.serialization [JsonElement] tree to our [JsonNode] tree — plain function, no dispatch overhead. */
+private fun JsonElement.toJsonNode(): JsonNode = when (this) {
+    is JsonObject -> JsonNode.JObject(entries.map { (key, value) -> key to value.toJsonNode() })
+    is JsonArray -> JsonNode.JArray(map { it.toJsonNode() })
+    JsonNull -> JsonNode.JNull
+    is JsonPrimitive -> when {
+        isString -> JsonNode.JString(content)
+        booleanOrNull != null -> JsonNode.JBoolean(boolean)
+        else -> JsonNode.JNumber(content)
     }
 }

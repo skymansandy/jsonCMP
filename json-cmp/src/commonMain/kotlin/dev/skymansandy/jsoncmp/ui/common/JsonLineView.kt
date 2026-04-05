@@ -158,13 +158,9 @@ internal fun JsonLineView(
         }
     } else {
         // Expanded: render all parts with syntax colors and optional search highlights
-        val lineText = remember(line) {
-            buildString { line.parts.forEach { append(it.text) } }
-        }
-
         val styledText = remember(line, searchQuery, colors) {
             buildAnnotatedString {
-                append(lineText)
+                append(line.text)
                 var cursor = 0
                 line.parts.forEach { part ->
                     addStyle(
@@ -175,7 +171,7 @@ internal fun JsonLineView(
                     cursor += part.text.length
                 }
                 if (searchQuery.isNotBlank()) {
-                    val lower = lineText.lowercase()
+                    val lower = line.text.lowercase()
                     val queryLower = searchQuery.lowercase()
                     var idx = lower.indexOf(queryLower)
                     while (idx >= 0) {
